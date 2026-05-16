@@ -1,0 +1,19 @@
+# Virtual Environment
+venv/
+.venv/
+env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases (if use local sqlite for testing)
+*.sqlite3
+
+# Environments / Secrets
+.env
+
+# Operating System Files
+.DS_Store
+Thumbs.db
