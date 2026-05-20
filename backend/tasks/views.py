@@ -5,13 +5,20 @@ from django.shortcuts import get_object_or_404
 from .models import Task
 from .serializers import TaskSerializer
 
-class TaskListCreateAPIView(APIView):
+
+
+#Parent (Base class Holds common Form/metadata logic)
+class TaskBaseAPIView(APIView):
     #registring serializer class globally
     serializer_class=TaskSerializer
 
-    #Feeding metadata to Borwser UI for form
+    #Feeding metadata to Borwser UI for form Design
     def get_serializer(self,*args,**kwargs):
         return self.serializer_class(*args,**kwargs)
+    
+
+#List & Create View
+class TaskListCreateAPIView(TaskBaseAPIView):
     
     #List all tasks
     def get(self,request):
@@ -28,23 +35,24 @@ class TaskListCreateAPIView(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
+# Detail, Update & Delete View
+class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
 
-class TaskDetailAPIView(APIView):
-    #replacing repeatation with one get_obj func
-    def get_object(self,request,pk):
+    #replacing repeatation with one get_obj func(for 404)
+    def get_object(self,pk):
         return get_object_or_404(Task,pk=pk)
     
     #reterive single task
     def get(self,request,pk):
        task=self.get_object(pk)
-       serializer=TaskSerializer(task)
+       serializer=self.get_serializer(task)
        return Response(serializer.data,status=status.HTTP_200_OK)
     
     #update task
     def put(self,request,pk):
         task=self.get_object(pk)
         #existing database task and new data to serializer
-        serializer=TaskSerializer(task,data=request.data)
+        serializer=self.get_serializer(task,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
