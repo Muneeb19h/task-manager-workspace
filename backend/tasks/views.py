@@ -6,7 +6,6 @@ from .models import Task
 from .serializers import TaskSerializer
 
 
-
 #Parent (Base class Holds common Form/metadata logic)
 class TaskBaseAPIView(APIView):
     #registring serializer class globally

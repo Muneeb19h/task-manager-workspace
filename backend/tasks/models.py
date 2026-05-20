@@ -11,9 +11,9 @@ class Task(models.Model):
     description=models.TextField(blank=True,null=True)
     status=models.CharField(max_length=20,choices=StatusChoices.choices,default=StatusChoices.PENDING)
     due_date=models.DateField()
-    created_at=models.DateTimeField(auto_now_add=True) #for Query purposes bcs it would e unique
-    updated_at=models.DateTimeField(auto_now=True)      # same purpose
+    created_at=models.DateTimeField(auto_now_add=True) #sets timestamp only once ,never changes
+    updated_at=models.DateTimeField(auto_now=True)      # changes timestamp every single time we save changes
 
-def __str__(self):
-    return self.title    
+    def __str__(self):
+        return self.title    
 
