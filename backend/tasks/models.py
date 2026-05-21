@@ -11,6 +11,8 @@ class Task(models.Model):
     description=models.TextField(blank=True,null=True)
     status=models.CharField(max_length=20,choices=StatusChoices.choices,default=StatusChoices.PENDING)
     due_date=models.DateField()
+    
+    # Additional : For tracking Lifecycle of a task
     created_at=models.DateTimeField(auto_now_add=True) #sets timestamp only once ,never changes
     updated_at=models.DateTimeField(auto_now=True)      # changes timestamp every single time we save changes
 
