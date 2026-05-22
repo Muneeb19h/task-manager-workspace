@@ -20,3 +20,9 @@ class TaskSerializer(serializers.ModelSerializer):
         if value.isdigit():
             raise serializers.ValidationError("The title cannot consist of numbers only")
         return value
+    
+    # in description only meaningful notes should be provided
+    def validate_description(self,value):
+        if value and len(value.strip())<10:
+            raise serializers.ValidationError("If description is provided, it must be 10 Characters long")
+        return value

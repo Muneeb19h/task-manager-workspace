@@ -15,18 +15,13 @@ class TaskBaseAPIView(APIView):
     def get_serializer(self,*args,**kwargs):
         return self.serializer_class(*args,**kwargs)
     
-    
-    
-    
-    
-    
 
 #List & Create View
 class TaskListCreateAPIView(TaskBaseAPIView):
     
     #List all tasks
     def get(self,request):
-        tasks=Task.objects.all().order_by('-created_at') 
+        tasks=Task.objects.all().order_by('id') 
         serializer=self.get_serializer(tasks,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
