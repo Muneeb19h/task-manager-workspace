@@ -1,6 +1,13 @@
-
 import React from 'react';
 import type { SidebarProps, TabId } from '../../types/layout';
+import { 
+  FaThLarge, 
+  FaListUl, 
+  FaPlusCircle, 
+  FaSun, 
+  FaMoon, 
+  FaUserAlt 
+} from 'react-icons/fa';
 
 //  Clean Style Extraction Layer
 const styles = {
@@ -23,12 +30,12 @@ const styles = {
       dark ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-200/40 border-slate-300/60'
     }`,
   themeWidgetText: (dark: boolean) => 
-    `text-xs font-bold tracking-wide ${dark ? 'text-slate-400' : 'text-slate-600'}`,
+    `text-xs font-bold tracking-wide flex items-center gap-2 ${dark ? 'text-slate-400' : 'text-slate-600'}`,
   profileContainer: (dark: boolean) => 
     `pt-4 border-t flex items-center gap-3 px-2 ${dark ? 'border-slate-800/60' : 'border-slate-200'}`,
   profileIconContainer: (dark: boolean) => 
-    `h-10 w-10 rounded-full flex items-center justify-center text-lg shadow-inner ${
-      dark ? 'bg-slate-800 border border-slate-700' : 'bg-slate-200 border border-slate-300'
+    `h-10 w-10 rounded-full flex items-center justify-center text-sm shadow-inner ${
+      dark ? 'bg-slate-800 border border-slate-700 text-slate-400' : 'bg-slate-200 border border-slate-300 text-slate-500'
     }`,
   profileName: (dark: boolean) => 
     `text-xs font-bold ${dark ? 'text-slate-200' : 'text-slate-800'}`
@@ -37,14 +44,15 @@ const styles = {
 interface MenuItem {
   id: TabId;
   label: string;
-  icon: string;
+  icon: React.ReactNode; // Updated to accept icon elements
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, darkMode, setDarkMode }) => {
+  // Configured with clean vector icons
   const menuItems: MenuItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'all-tasks', label: 'All Tasks', icon: '📝' },
-    { id: 'add-task', label: 'Add Task', icon: '➕' },
+    { id: 'dashboard', label: 'Dashboard', icon: <FaThLarge /> },
+    { id: 'all-tasks', label: 'All Tasks', icon: <FaListUl /> },
+    { id: 'add-task', label: 'Add Task', icon: <FaPlusCircle /> },
   ];
 
   return (
@@ -52,7 +60,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, darkM
       <div>
         {/* Brand Header */}
         <div className="flex items-center gap-3 mb-8 px-2">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 font-bold">
             ✓
           </div>
           <span className={styles.brandText(darkMode)}>TaskManager</span>
@@ -66,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, darkM
               onClick={() => setActiveTab(item.id)}
               className={styles.navButton(activeTab === item.id, darkMode)}
             >
-              <span className="text-base transition-transform group-hover:scale-110 duration-200">
+              <span className="text-sm transition-transform group-hover:scale-110 duration-200">
                 {item.icon}
               </span>
               {item.label}
@@ -77,26 +85,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, darkM
 
       {/* Footer System Status Panel */}
       <div className="space-y-4">
-        {/* Toggle Switch */}
+        {/* Toggle Switch Widget */}
         <div className={styles.themeWidget(darkMode)}>
           <span className={styles.themeWidgetText(darkMode)}>
-            {darkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}
+            {darkMode ? (
+              <>
+                <FaMoon className="text-indigo-400" /> Dark Mode
+              </>
+            ) : (
+              <>
+                <FaSun className="text-amber-500" /> Light Mode
+              </>
+            )}
           </span>
           <button
+            type="button"
             onClick={() => setDarkMode(!darkMode)}
-            className="w-11 h-6 bg-indigo-600 rounded-full p-0.5 transition-colors relative shadow-inner"
+            className="w-11 h-6 bg-indigo-600 rounded-full p-0.5 transition-colors relative shadow-inner outline-none"
           >
             <div className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-200 flex items-center justify-center text-[10px] ${
               darkMode ? 'translate-x-5' : 'translate-x-0'
             }`}>
-              {darkMode ? '🌙' : '☀️'}
+              {darkMode ? <FaMoon className="text-indigo-600 text-[9px]" /> : <FaSun className="text-amber-500 text-[9px]" />}
             </div>
           </button>
         </div>
 
         {/* User Card */}
         <div className={styles.profileContainer(darkMode)}>
-          <div className={styles.profileIconContainer(darkMode)}>👤</div>
+          <div className={styles.profileIconContainer(darkMode)}>
+            <FaUserAlt />
+          </div>
           <div>
             <div className={styles.profileName(darkMode)}>Developer Profile</div>
             <div className="text-[10px] text-indigo-500 font-medium tracking-wider font-mono">SYSTEM INTERN</div>

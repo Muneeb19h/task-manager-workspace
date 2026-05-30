@@ -1,7 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import React, { useState } from 'react';
 import type { TaskFormProps } from '../../types/layout';
+import { FormSelect, type FormOption } from './FormSelect';
+import { 
+  FaHourglassHalf, 
+  FaBolt, 
+  FaCheckCircle, 
+  FaArrowCircleDown, 
+  FaMinusCircle, 
+  FaExclamationCircle,
+  FaTrashAlt,
+  FaSave,
+  FaPlus
+} from 'react-icons/fa';
 
 const styles = {
   card: (dark: boolean) => 
@@ -33,8 +44,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({ darkMode, onTaskCreated, ini
   const [description, setDescription] = useState(initialTask?.description || '');
   const [status, setStatus] = useState(initialTask?.status || 'Pending');
   const [priority, setPriority] = useState(initialTask?.priority || 'Medium');
-  // New State Variable Added Here:
   const [dueDate, setDueDate] = useState(initialTask?.dueDate || '');
+
+  // 📝 Status Options Map Configuration
+  const statusOptions: FormOption[] = [
+    { value: 'Pending', label: 'Pending', icon: <FaHourglassHalf className="text-amber-500 text-xs" /> },
+    { value: 'In Progress', label: 'In Progress', icon: <FaBolt className="text-blue-400 text-xs" /> },
+    { value: 'Completed', label: 'Completed', icon: <FaCheckCircle className="text-emerald-400 text-xs" /> }
+  ];
+
+  // 🎯 Priority Options Map Configuration
+  const priorityOptions: FormOption[] = [
+    { value: 'Low', label: 'Low', icon: <FaArrowCircleDown className="text-slate-400 text-xs" /> },
+    { value: 'Medium', label: 'Medium', icon: <FaMinusCircle className="text-amber-500 text-xs" /> },
+    { value: 'High', label: 'High', icon: <FaExclamationCircle className="text-rose-500 text-xs" /> }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,28 +99,28 @@ export const TaskForm: React.FC<TaskFormProps> = ({ darkMode, onTaskCreated, ini
           />
         </div>
 
-        {/* 🛠️ Dynamic 3-Column Input Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label className={styles.label(darkMode)}>Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value as any)} className={styles.input(darkMode)}>
-              <option value="Pending">⌛ Pending</option>
-              <option value="In Progress">⚡ In Progress</option>
-              <option value="Completed">✅ Completed</option>
-            </select>
-          </div>
+        {/* 🛠️ Modern 3-Column Input Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end">
+          {/* Custom Status Component Selector */}
+          <FormSelect 
+            labelTitle="Status"
+            darkMode={darkMode}
+            selectedValue={status}
+            options={statusOptions}
+            onSelectChange={(val) => setStatus(val as any)}
+          />
 
-          <div>
-            <label className={styles.label(darkMode)}>Priority</label>
-            <select value={priority} onChange={(e) => setPriority(e.target.value as any)} className={styles.input(darkMode)}>
-              <option value="Low">🟢 Low</option>
-              <option value="Medium">🟡 Medium</option>
-              <option value="High">🔴 High</option>
-            </select>
-          </div>
+          {/* Custom Priority Component Selector */}
+          <FormSelect 
+            labelTitle="Priority"
+            darkMode={darkMode}
+            selectedValue={priority}
+            options={priorityOptions}
+            onSelectChange={(val) => setPriority(val as any)}
+          />
 
-          {/* 📅 NEW DUE DATE FIELD CONTAINER */}
-          <div>
+          {/* Due Date Field Container */}
+          <div className="space-y-2">
             <label className={styles.label(darkMode)}>Due Date</label>
             <input 
               type="date"
@@ -108,19 +132,27 @@ export const TaskForm: React.FC<TaskFormProps> = ({ darkMode, onTaskCreated, ini
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-slate gap-4 pt-4 border-t border-slate-800/10">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800/10">
           <div>
             {isUpdateMode && onDelete && (
               <button type="button" onClick={() => onDelete(initialTask.id)} className={styles.btnDelete}>
-                🗑️ Delete Task Entry
+                <FaTrashAlt className="text-xs" /> Delete Task Entry
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-3 justify-end">
+          <div className="flex items-center gap-3 justify-end w-full sm:w-auto">
             <button type="button" onClick={onTaskCreated} className={styles.btnSecondary(darkMode)}>Cancel</button>
             <button type="submit" className={styles.btnPrimary}>
-              {isUpdateMode ? '💾 Save Changes' : '➕ Deploy Task'}
+              {isUpdateMode ? (
+                <>
+                  <FaSave className="text-xs" /> Save Changes
+                </>
+              ) : (
+                <>
+                  <FaPlus className="text-xs" /> Deploy Task
+                </>
+              )}
             </button>
           </div>
         </div>

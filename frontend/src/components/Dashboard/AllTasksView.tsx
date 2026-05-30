@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Task, TaskStatus } from '../../types/layout';
+import { CustomStatusSelect } from './CustomStatusSelect';
 
 interface AllTasksProps {
   darkMode: boolean;
@@ -26,19 +27,11 @@ export const AllTasksView: React.FC<AllTasksProps> = ({ darkMode, tasks, statusF
           <p className="text-xs text-slate-400">Reviewing all data matching active scope filter indices.</p>
         </div>
         
-        <select 
-          value={statusFilter}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          onChange={(e) => setStatusFilter(e.target.value as any)}
-          className={`px-4 py-2 rounded-xl text-xs font-bold border focus:outline-none ${
-            darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="All">🌐 Show All Tasks</option>
-          <option value="Pending">⌛ Pending Status Only</option>
-          <option value="In Progress">⚡ In Progress Only</option>
-          <option value="Completed">✅ Completed Only</option>
-        </select>
+        <CustomStatusSelect 
+  darkMode={darkMode} 
+  statusFilter={statusFilter} 
+  setStatusFilter={setStatusFilter} 
+/>
       </div>
 
       {/* Main Structural Layout Split-Screen */}
@@ -144,3 +137,4 @@ export const AllTasksView: React.FC<AllTasksProps> = ({ darkMode, tasks, statusF
     </div>
   );
 };
+export default AllTasksView;

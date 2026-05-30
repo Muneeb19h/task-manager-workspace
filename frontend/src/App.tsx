@@ -1,8 +1,8 @@
 // src/App.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Sidebar from './components/Layout/Sidebar';
 import { StatsGrid } from './components/Dashboard/StatsGrid';
-import { AllTasksView } from './components/Dashboard/AllTasksView';
+import AllTasksView from './components/Dashboard/AllTasksView';
 import TaskForm from './components/Dashboard/TaskForm';
 import TaskList from './components/Dashboard/TaskList';
 import type { TabId, Task, TaskStatus } from './types/layout';
