@@ -1,55 +1,64 @@
+
 import React, { useState } from 'react';
 import Sidebar from './components/Layout/Sidebar';
 import StatsGrid from './components/Dashboard/StatsGrid';
 import TaskForm from './components/Dashboard/TaskForm';
 import TaskList from './components/Dashboard/TaskList';
+import type { TabId } from './types/layout';
+
+// Layout Shell Structural Classes
+const styles = {
+  canvas: (dark: boolean) => 
+    `min-h-screen flex flex-col lg:flex-row antialiased font-sans transition-colors duration-300 ${
+      dark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+    }`,
+  mainContentShell: "flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full",
+  welcomeTitle: (dark: boolean) => 
+    `flex items-center gap-2 text-2xl md:text-3xl font-black tracking-tight ${dark ? 'text-white' : 'text-slate-900'}`,
+  subtitleText: (dark: boolean) => 
+    `mt-1 text-xs md:text-sm ${dark ? 'text-slate-400' : 'text-slate-600'}`,
+  dbTag: (dark: boolean) => 
+    `text-xs px-3.5 py-1.5 rounded-full font-mono border shadow-inner flex items-center gap-2 transition-colors ${
+      dark ? 'bg-slate-900/80 text-indigo-400 border-slate-800/80' : 'bg-white text-indigo-600 border-slate-200'
+    }`
+};
 
 const App = () => {
-  // 1. Navigation Controller: Tracks active tab ('dashboard' | 'add-task' | 'all-tasks')
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'add-task' | 'all-tasks'>('dashboard');
-  
-  // 2. Theme Controller: Tracks system display style
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [darkMode, setDarkMode] = useState<boolean>(true);
 
   return (
-    // Master container toggles deep background palettes dynamically based on theme state
-    <div className={`min-h-screen flex flex-col lg:flex-row antialiased font-sans transition-colors duration-300 ${
-      darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
-    }`}>
-      
-      {/* SIDEBAR NAVIGATION PANEL (We pass control functions as props!) */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} darkMode={darkMode} setDarkMode={setDarkMode} />
+    <div className={styles.canvas(darkMode)}>
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        darkMode={darkMode} 
+        setDarkMode={setDarkMode} 
+      />
 
-      {/* PRIMARY CONSOLE HUB AREA */}
-      <div className="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
-        
-        {/* HEADER BRAND CONTROL LAYER */}
+      <div className={styles.mainContentShell}>
+        {/* Core Header View Layer */}
         <header className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <div className={`flex items-center gap-2 text-2xl md:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            <div className={styles.welcomeTitle(darkMode)}>
               <span>Welcome back, Developer!</span>
               <span className="animate-bounce origin-bottom-right inline-block">👋</span>
             </div>
-            <p className={darkMode ? 'text-slate-400 mt-1 text-xs md:text-sm' : 'text-slate-600 mt-1 text-xs md:text-sm'}>
+            <p className={styles.subtitleText(darkMode)}>
               Here's your live architectural data overview stream.
             </p>
           </div>
           
-          <span className={`text-xs px-3.5 py-1.5 rounded-full font-mono border shadow-inner flex items-center gap-2 transition-colors ${
-            darkMode ? 'bg-slate-900/80 text-indigo-400 border-slate-800/80' : 'bg-white text-indigo-600 border-slate-200'
-          }`}>
+          <span className={styles.dbTag(darkMode)}>
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             PostgreSQL Active
           </span>
         </header>
 
-        {/* DYNAMIC VIEW ROUTING PORT */}
+        {/* View Port Routing Handler Switching Board */}
         {activeTab === 'dashboard' && (
           <div className="space-y-8 animate-fadeIn">
-            {/* Metric Blocks Overview */}
             <StatsGrid darkMode={darkMode} />
-            
-            {/* The primary active item columns component now takes up 100% full stretch room! */}
             <div className="w-full">
               <TaskList darkMode={darkMode} />
             </div>
@@ -70,7 +79,6 @@ const App = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
