@@ -1,5 +1,7 @@
 
 export type TabId = 'dashboard' | 'add-task' | 'all-tasks';
+export type TaskStatus='Pending'|'In Progress'|'Completed';
+export type FilterStatus=TaskStatus|'All'
 
 export interface ThemeConfig {
   darkMode: boolean;
@@ -9,6 +11,9 @@ export interface ThemeConfig {
 export interface NavigationConfig {
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
+  // Track which status filter is actively applied to the main workspace list
+  statusFilter: FilterStatus | 'All';
+  setStatusFilter: (status: FilterStatus) => void;
 }
 
 

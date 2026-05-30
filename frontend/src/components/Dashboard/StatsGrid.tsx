@@ -1,31 +1,78 @@
+// src/components/Dashboard/StatsGrid.tsx
 import React from 'react';
+import type { FilterStatus, TabId } from '../../types/layout';
 
 interface StatsGridProps {
   darkMode: boolean;
+  setActiveTab: (tab: TabId) => void;
+  setStatusFilter: (status: FilterStatus) => void;
+  tasksCount: {
+    total: number;
+    pending: number;
+    inProgress: number;
+    completed: number;
+  };
 }
 
-export const StatsGrid: React.FC<StatsGridProps> = ({ darkMode }) => {
-  const stats = [
-    { title: 'Total Tasks', value: '24', color: 'from-purple-500', trend: '↑ 12% vs last week', darkText: 'text-purple-400', lightText: 'text-purple-600' },
-    { title: 'Pending', value: '8', color: 'from-amber-500', trend: '↑ 5% vs last week', darkText: 'text-amber-400', lightText: 'text-amber-600' },
-    { title: 'In Progress', value: '9', color: 'from-blue-500', trend: '↑ 18% vs last week', darkText: 'text-blue-400', lightText: 'text-blue-600' },
-    { title: 'Completed', value: '7', color: 'from-emerald-500', trend: '↑ 20% vs last week', darkText: 'text-emerald-400', lightText: 'text-emerald-600' },
+export const StatsGrid: React.FC<StatsGridProps> = ({ darkMode, setActiveTab, setStatusFilter, tasksCount }) => {
+  // Configurable array driving the grid dynamically
+  const metrics = [
+    { 
+      label: 'Total Tasks', 
+      count: tasksCount.total, 
+      filterValue: 'All' as FilterStatus, 
+      color: 'border-indigo-500 text-indigo-400 bg-indigo-500/5' 
+    },
+    { 
+      label: 'Pending', 
+      count: tasksCount.pending, 
+      filterValue: 'Pending' as FilterStatus, 
+      color: 'border-amber-500 text-amber-500 bg-amber-500/5' 
+    },
+    { 
+      label: 'In Progress', 
+      count: tasksCount.inProgress, 
+      filterValue: 'In Progress' as FilterStatus, 
+      color: 'border-blue-500 text-blue-400 bg-blue-500/5' 
+    },
+    { 
+      label: 'Completed', 
+      count: tasksCount.completed, 
+      filterValue: 'Completed' as FilterStatus, 
+      color: 'border-emerald-500 text-emerald-400 bg-emerald-500/5' 
+    }
   ];
 
+  const handleCardClick = (targetFilter: FilterStatus) => {
+    setStatusFilter(targetFilter); // 1. Set the exact database pipeline filter state
+    setActiveTab('all-tasks');    // 2. Redirect focus to your records table layout view
+  };
+
   return (
-    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-      {stats.map((card, idx) => (
-        <div key={idx} className={`p-5 rounded-2xl relative overflow-hidden group shadow-md transition-colors border ${
-          darkMode ? 'bg-slate-900/40 border-slate-800/60' : 'bg-white border-slate-200'
-        }`}>
-          <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-950 ${card.color} to-transparent opacity-40 group-hover:opacity-100 transition-opacity`} />
-          <div className={`text-xs font-bold tracking-widest uppercase ${darkMode ? card.darkText : card.lightText}`}>{card.title}</div>
-          <div className={`text-3xl font-black mt-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{card.value}</div>
-          <div className={`text-[10px] mt-2 font-mono ${darkMode ? `${card.darkText}/70` : `${card.lightText}/80`}`}>{card.trend}</div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      {metrics.map((metric) => (
+        <div 
+          key={metric.label}
+          onClick={() => handleCardClick(metric.filterValue)}
+          className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            darkMode 
+              ? 'bg-slate-900/40 border-slate-800/60 hover:bg-slate-900/80 hover:border-slate-700/80' 
+              : 'bg-white border-slate-200 hover:shadow-slate-200/60'
+          }`}
+        >
+          <div className="flex justify-between items-center">
+            <span className={`text-[11px] font-black tracking-wider uppercase ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              {metric.label}
+            </span>
+            <span className={`text-[9px] px-2 py-0.5 font-mono rounded border ${metric.color}`}>
+              Analyze View
+            </span>
+          </div>
+          <div className={`text-3xl md:text-4xl font-black mt-4 tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            {metric.count}
+          </div>
         </div>
       ))}
-    </section>
+    </div>
   );
 };
-
-export default StatsGrid;
