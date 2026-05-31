@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TaskListProps } from '../../types/layout';
+import type { TaskListProps } from '../types/task.types';
 
 export const TaskList: React.FC<TaskListProps> = ({ darkMode }) => {
   // Mock data structural array mirroring standard response models

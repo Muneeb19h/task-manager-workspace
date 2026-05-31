@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaGlobe, FaHourglassHalf, FaBolt, FaCheckCircle, FaChevronDown } from 'react-icons/fa';
-import type { CustomStatusSelectProps, FilterStatus } from '../../types/layout';
+import type { CustomStatusSelectProps, FilterStatus } from '../types/task.types';
 
 export const CustomStatusSelect: React.FC<CustomStatusSelectProps> = ({
   darkMode,

@@ -1,8 +1,6 @@
-// src/components/Dashboard/FormSelect.tsx
 import React, { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-// ⚡ Import types directly from your unified layout file
-import type { FormSelectProps } from '../../types/layout';
+import type { FormSelectProps } from './types/form.types';
 
 export const FormSelect: React.FC<FormSelectProps> = ({
   labelTitle,

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
-import type { SidebarProps, TabId } from '../../types/layout';
+import type { SidebarProps } from './types/sidebar.types';
+import type { TabId } from '../../types/navigation.types';
 import { sidebarStyles as styles } from './Sidebar.styles';
 import {
   FaThLarge,
@@ -37,9 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleNavClick = (id: TabId) => {
     setActiveTab(id);
-    // ⚡ USE THE PROPS HERE TO HAPPY THE ESLINT RULE:
     if (id === 'all-tasks') {
-      setStatusFilter('All'); // Automatically clear filters when viewing all tasks
+      setStatusFilter('All');
     } else {
       // Just a dummy read or assignment to clear the linting warning cleanly
       const _ = statusFilter;

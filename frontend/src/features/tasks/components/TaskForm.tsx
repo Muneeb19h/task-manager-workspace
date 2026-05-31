@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import type { TaskFormProps, TaskStatus, FormOption } from '../../types/layout';
-import { FormSelect } from '../ui/FormSelect';
-import { taskFormStyles as styles } from './TaskForm.styles';
+import type { TaskFormProps, TaskStatus } from '../types/task.types';
+import type { FormOption } from '../../../components/ui/types/form.types';
+import { FormSelect } from '../../../components/ui/FormSelect';
+import { taskFormStyles as styles } from '../styles/TaskForm.styles';
 import {
   FaHourglassHalf,
   FaBolt,
@@ -114,7 +115,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             selectedValue={status}
             options={statusOptions}
             // ⚡ Type-safe handler conversion without using raw 'as any' casting tricks
-            onSelectChange={(val) => setStatus(val as TaskStatus)}
+            onSelectChange={(val: string) => setStatus(val as TaskStatus)}
           />
 
           {/* Custom Priority Component Selector */}
@@ -124,7 +125,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             selectedValue={priority}
             options={priorityOptions}
             // ⚡ Type-safe handler conversion without using raw 'as any' casting tricks
-            onSelectChange={(val) => setPriority(val as 'Low' | 'Medium' | 'High')}
+            onSelectChange={(val: string) => setPriority(val as 'Low' | 'Medium' | 'High')}
           />
 
           {/* Due Date Field Container */}

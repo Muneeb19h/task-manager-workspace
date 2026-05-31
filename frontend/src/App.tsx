@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import Sidebar from './components/Layout/Sidebar';
-import { StatsGrid } from './components/Dashboard/StatsGrid';
-import AllTasksView from './components/Dashboard/AllTasksView';
-import TaskForm from './components/Dashboard/TaskForm';
-import TaskList from './components/Dashboard/TaskList';
+import Sidebar from './components/layout/Sidebar';
+import { StatsGrid } from './features/tasks/components/StatsGrid';
+import AllTasksView from './features/tasks/components/AllTasksView';
+import TaskForm from './features/tasks/components/TaskForm';
+import TaskList from './features/tasks/components/TaskList';
 import type { TabId, Task, FilterStatus } from './types/layout';
 
 const App = () => {

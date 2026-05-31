@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { AllTasksProps, Task } from '../../types/layout';
-import { CustomStatusSelect } from '../ui/CustomStatusSelect';
+import type { AllTasksProps, Task } from '../types/task.types';
+import { CustomStatusSelect } from './CustomStatusSelect';
 
 export const AllTasksView: React.FC<AllTasksProps> = ({
   darkMode,
