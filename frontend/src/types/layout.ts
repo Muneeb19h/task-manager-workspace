@@ -1,7 +1,6 @@
-
 export type TabId = 'dashboard' | 'add-task' | 'all-tasks';
-export type TaskStatus='Pending'|'In Progress'|'Completed';
-export type FilterStatus=TaskStatus|'All'
+export type TaskStatus = 'Pending' | 'In Progress' | 'Completed';
+export type FilterStatus = TaskStatus | 'All';
 
 export interface ThemeConfig {
   darkMode: boolean;
@@ -12,19 +11,17 @@ export interface NavigationConfig {
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
   // Track which status filter is actively applied to the main workspace list
-  statusFilter: FilterStatus | 'All';
+  statusFilter: FilterStatus;
   setStatusFilter: (status: FilterStatus) => void;
 }
-
 
 export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'Pending' | 'In Progress' | 'Completed';
+  status: TaskStatus;
   priority: 'Low' | 'Medium' | 'High';
-  dueDate:string;
-
+  dueDate: string;
 }
 
 export interface TaskFormProps {
