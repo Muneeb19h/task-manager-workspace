@@ -51,7 +51,6 @@ const App = () => {
         darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* ⚡ FIXED: All props required by SidebarProps are now perfectly bound here */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}

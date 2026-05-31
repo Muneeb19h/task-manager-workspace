@@ -1,17 +1,5 @@
 import React from 'react';
-import type { FilterStatus, TabId } from '../../types/layout';
-
-interface StatsGridProps {
-  darkMode: boolean;
-  setActiveTab: (tab: TabId) => void;
-  setStatusFilter: (status: FilterStatus) => void;
-  tasksCount: {
-    total: number;
-    pending: number;
-    inProgress: number;
-    completed: number;
-  };
-}
+import type { StatsGridProps, FilterStatus } from '../../types/layout';
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
   darkMode,
@@ -84,3 +72,5 @@ export const StatsGrid: React.FC<StatsGridProps> = ({
     </div>
   );
 };
+
+export default StatsGrid;

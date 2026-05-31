@@ -1,8 +1,5 @@
 import React from 'react';
-
-interface TaskListProps {
-  darkMode: boolean;
-}
+import type { TaskListProps } from '../../types/layout';
 
 export const TaskList: React.FC<TaskListProps> = ({ darkMode }) => {
   // Mock data structural array mirroring standard response models
@@ -44,7 +41,6 @@ export const TaskList: React.FC<TaskListProps> = ({ darkMode }) => {
       {columns.map((col) => (
         <div
           key={col.id}
-          /* ⚡ FIXED BELOW: min-h-0 for tight content fitting on mobile, md:min-h-[450px] for large layouts */
           className={`p-4 rounded-2xl border min-h-0 md:min-h-[450px] transition-colors ${
             darkMode ? 'bg-slate-900/20 border-slate-800/40' : 'bg-slate-100/60 border-slate-200'
           }`}

@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import type { Task, TaskStatus } from '../../types/layout';
+import type { AllTasksProps, Task } from '../../types/layout';
 import { CustomStatusSelect } from '../ui/CustomStatusSelect';
-
-interface AllTasksProps {
-  darkMode: boolean;
-  tasks: Task[];
-  statusFilter: TaskStatus | 'All';
-  setStatusFilter: (status: TaskStatus | 'All') => void;
-  onEditSelect: (task: Task) => void;
-}
 
 export const AllTasksView: React.FC<AllTasksProps> = ({
   darkMode,
@@ -182,4 +174,5 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
     </div>
   );
 };
+
 export default AllTasksView;
