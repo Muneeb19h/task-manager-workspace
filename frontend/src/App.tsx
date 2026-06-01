@@ -15,23 +15,6 @@ const App = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask } =
     useTaskOperations();
-  // const tasks: Task[] = [
-  //   {
-  //     id: '1',
-  //     title: 'Configure Django CORS Whitelist',
-  //     description: 'Secure connection variables rules across API headers.',
-  //     status: 'Pending',
-  //     dueDate: '2026-06-05',
-  //   },
-  //   {
-  //     id: '2',
-  //     title: 'Integrate React Bits Interactive Layouts',
-  //     description: 'Assemble premium metrics analytics boards.',
-  //     status: 'In Progress',
-  //     dueDate: '2026-06-12',
-  //   },
-  // ];
-
   useEffect(() => {
     fetchTasks();
   }, []);

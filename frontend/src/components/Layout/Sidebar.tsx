@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import type { SidebarProps } from './types/sidebar.types';
 import type { TabId } from '../../types/navigation.types';
@@ -12,6 +11,7 @@ import {
   FaUserAlt,
   FaBars,
   FaTimes,
+  FaCheckDouble,
 } from 'react-icons/fa';
 
 interface MenuItem {
@@ -25,7 +25,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setActiveTab,
   darkMode,
   setDarkMode,
-  statusFilter,
   setStatusFilter,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,16 +39,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setActiveTab(id);
     if (id === 'all-tasks') {
       setStatusFilter('All');
-    } else {
-      // Just a dummy read or assignment to clear the linting warning cleanly
-      const _ = statusFilter;
     }
+    setIsOpen(false);
+  };
+
+  // Shared function to route users back home cleanly when clicking the brand logo
+  const handleLogoRedirect = () => {
+    setActiveTab('dashboard');
+    setStatusFilter('All');
     setIsOpen(false);
   };
 
   return (
     <>
-      {/* 📱 Mobile Context Menu Header */}
+      {/*Mobile Context Menu Header */}
       <header
         className={`lg:hidden w-full p-4 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${
           darkMode
@@ -57,11 +60,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
             : 'bg-slate-100/80 border-slate-200 text-slate-900'
         }`}
       >
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md font-bold text-sm">
-            ✓
+        {/* CLICKABLE LOGO FOR MOBILE SCREEN */}
+        <div
+          onClick={handleLogoRedirect}
+          className="flex items-center gap-2.5 cursor-pointer group"
+          title="Go to Dashboard Home"
+        >
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md font-bold text-sm transform group-hover:scale-105 transition-transform duration-200">
+            <FaCheckDouble className="text-xs" />
           </div>
-          <span className="text-lg font-black tracking-tight">TaskManager</span>
+          <span className="text-lg font-black tracking-tight group-hover:text-indigo-400 transition-colors duration-200">
+            TaskManager
+          </span>
         </div>
 
         <button
@@ -90,11 +100,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside className={styles.container(darkMode, isOpen)}>
         <div>
           <div className="flex items-center justify-between mb-8 px-2">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 font-bold">
-                ✓
+            {/*CLICKABLE LOGO FOR DESKTOP DRAWER */}
+            <div
+              onClick={handleLogoRedirect}
+              className="flex items-center gap-3 cursor-pointer group w-full"
+              title="Go to Dashboard Home"
+            >
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 font-bold transform group-hover:scale-105 transition-transform duration-200">
+                <FaCheckDouble className="text-sm" />
               </div>
-              <span className={styles.brandText(darkMode)}>TaskManager</span>
+              <span
+                className={`${styles.brandText(darkMode)} group-hover:text-indigo-400 transition-colors duration-200`}
+              >
+                TaskManager
+              </span>
             </div>
 
             <button
