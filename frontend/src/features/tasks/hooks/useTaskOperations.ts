@@ -67,31 +67,40 @@ export const useTaskOperations = () => {
     setError(null);
     try {
       const djangoPayload: Record<string, unknown> = {};
-
       if (payload.title !== undefined) djangoPayload.title = payload.title;
-      if (payload.description !== undefined) djangoPayload.description = payload.description;
       if (payload.status !== undefined) djangoPayload.status = payload.status;
       if (payload.dueDate !== undefined) djangoPayload.due_date = payload.dueDate;
+
       if (payload.description !== undefined && payload.description.trim() !== '') {
         djangoPayload.description = payload.description;
       } else if (payload.description === '') {
-        // If they explicitly cleared it, pass null or omit based on model configurations
         djangoPayload.description = null;
       }
-      // Interceptor returns a single cleanly mapped Task object
+
       const response = await taskClient.patch<Task>(`tasks/${id}/`, djangoPayload);
       setTasks((prev) => prev.map((task) => (task.id === id ? response.data : task)));
       return true;
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.detail || 'Failed to push task state modification updates.');
+        //Extract specific field validation messages from the Django Response dictionary
+        const backendErrors = err.response?.data;
+        if (backendErrors && backendErrors.due_date) {
+          setError(backendErrors.due_date[0]);
+        } else if (backendErrors && backendErrors.title) {
+          setError(backendErrors.title[0]);
+        } else if (backendErrors && backendErrors.description) {
+          setError(backendErrors.description[0]);
+        } else {
+          setError(backendErrors?.detail || 'Failed to push task state modification updates.');
+        }
+      } else {
+        setError('An unexpected system error occurred.');
       }
       return false;
     } finally {
       setIsLoading(false);
     }
   };
-
   // 4. DESTROY TASK (TaskRetrieveUpdateDestroyAPIView - DELETE)
   const deleteTask = async (id: string) => {
     setIsLoading(true);

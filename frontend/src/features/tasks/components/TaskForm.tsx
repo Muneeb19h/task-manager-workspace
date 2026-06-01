@@ -17,9 +17,12 @@ export const TaskForm: React.FC<TaskFormProps> = ({
   const [status, setStatus] = useState<TaskStatus>(editingTask ? editingTask.status : 'Pending');
   const [dueDate, setDueDate] = useState(editingTask ? editingTask.dueDate : '');
 
+  // ⚡ Local states to handle submission flow changes dynamically
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+
   const isUpdateMode = !!editingTask;
 
-  // Status Options Map Configuration
   const statusOptions = [
     {
       value: 'Pending',
@@ -42,19 +45,38 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     e.preventDefault();
     if (!title || !dueDate) return;
 
-    // 💡 FIX: Removed the unused standalone variable tracking to satisfy the compiler rule.
-    if (editingTask) {
-      const isUpdated = await onUpdateTask(editingTask.id, { title, description, status, dueDate });
-      if (isUpdated) {
-        setEditingTask(null);
-        setActiveTab('all-tasks');
+    setIsSubmitting(true);
+    setLocalError(null);
+
+    try {
+      if (editingTask) {
+        const isUpdated = await onUpdateTask(editingTask.id, {
+          title,
+          description,
+          status,
+          dueDate,
+        });
+        if (isUpdated) {
+          setEditingTask(null);
+          setActiveTab('all-tasks');
+        } else {
+          // Pulling error context back to form UI if operation returned false due to validation
+          setLocalError('The due date cannot be set in the past');
+        }
+      } else {
+        const isCreated = await onCreateTask({ title, description, status, dueDate });
+        if (isCreated) {
+          setEditingTask(null);
+          setActiveTab('all-tasks');
+        } else {
+          setLocalError('The due date cannot be set in the past');
+        }
       }
-    } else {
-      const isCreated = await onCreateTask({ title, description, status, dueDate });
-      if (isCreated) {
-        setEditingTask(null);
-        setActiveTab('all-tasks');
-      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      setLocalError('An error occurred while saving the task registry configuration.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,11 +99,19 @@ export const TaskForm: React.FC<TaskFormProps> = ({
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* ⚡ Error Message Container display */}
+        {localError && (
+          <div className="p-4 mb-4 text-sm text-red-800 rounded-xl bg-red-50 border border-red-200/60 dark:bg-red-950/40 dark:text-red-400 dark:border-red-900/50">
+            <span className="font-semibold">Validation Rejected:</span> {localError}
+          </div>
+        )}
+
         <div>
           <label className={styles.label(darkMode)}>Task Title</label>
           <input
             type="text"
             required
+            disabled={isSubmitting}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className={styles.input(darkMode)}
@@ -92,15 +122,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           <label className={styles.label(darkMode)}>Detailed Description</label>
           <textarea
             rows={3}
+            disabled={isSubmitting}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className={styles.input(darkMode)}
           />
         </div>
 
-        {/* Modern 3-Column Input Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-          {/* Custom Status Component Selector */}
           <FormSelect
             labelTitle="Status"
             darkMode={darkMode}
@@ -108,12 +137,13 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             options={statusOptions}
             onSelectChange={(val: string) => setStatus(val as TaskStatus)}
           />
-          {/* Due Date Field Container */}
+
           <div className="space-y-2">
             <label className={styles.label(darkMode)}>Due Date</label>
             <input
               type="date"
               required
+              disabled={isSubmitting}
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
               className={styles.input(darkMode)}
@@ -125,11 +155,18 @@ export const TaskForm: React.FC<TaskFormProps> = ({
           <div />
 
           <div className="flex items-center gap-3 justify-end w-full sm:w-auto">
-            <button type="button" onClick={handleCancel} className={styles.btnSecondary(darkMode)}>
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+              className={styles.btnSecondary(darkMode)}
+            >
               Cancel
             </button>
-            <button type="submit" className={styles.btnPrimary}>
-              {isUpdateMode ? (
+            <button type="submit" disabled={isSubmitting} className={styles.btnPrimary}>
+              {isSubmitting ? (
+                <span>Syncing System...</span>
+              ) : isUpdateMode ? (
                 <>
                   <FaSave className="text-xs" /> Save Changes
                 </>
