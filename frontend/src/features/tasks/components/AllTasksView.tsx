@@ -1,3 +1,4 @@
+import { FaTrash, FaSyncAlt, FaEdit, FaSearchMinus, FaTimes } from 'react-icons/fa';
 import React, { useState } from 'react';
 import type { AllTasksProps, Task } from '../types/task.types';
 import { CustomStatusSelect } from './CustomStatusSelect';
@@ -107,9 +108,9 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                     <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => onEditSelect(task)}
-                        className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition-colors"
                       >
-                        ⚙️ Edit
+                        <FaEdit className="text-xs" /> Edit
                       </button>
                     </td>
                   </tr>
@@ -142,9 +143,10 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                 </div>
                 <button
                   onClick={() => setSelectedTask(null)}
-                  className="text-slate-400 hover:text-white text-xs"
+                  className="flex items-center justify-center p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors"
+                  title="Close Details"
                 >
-                  ✕
+                  <FaTimes className="text-xs" />
                 </button>
               </div>
 
@@ -165,9 +167,10 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                   </span>
                   <button
                     onClick={() => handleStatusCycle(activeTaskDetails)}
-                    className="font-medium mt-1 inline-block text-indigo-400 hover:underline text-left cursor-pointer"
+                    className="flex items-center gap-1.5 font-medium mt-1 inline-block text-indigo-400 hover:underline text-left cursor-pointer"
                   >
-                    {activeTaskDetails.status} 🔄
+                    {activeTaskDetails.status}{' '}
+                    <FaSyncAlt className="text-[10px] animate-spin-hover" />
                   </button>
                 </div>
                 <div>
@@ -182,15 +185,17 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
               <div className="pt-4 border-t border-slate-800/10 flex justify-end">
                 <button
                   onClick={() => handleDeleteTrigger(activeTaskDetails.id)}
-                  className="px-3 py-1.5 bg-rose-950/40 border border-rose-900/40 text-rose-400 text-xs font-bold rounded-lg hover:bg-rose-900/40 transition-colors w-full sm:w-auto"
+                  className="flex items-center justify-center gap-2 px-3 py-1.5 bg-rose-950/40 border border-rose-900/40 text-rose-400 text-xs font-bold rounded-lg hover:bg-rose-900/40 transition-colors w-full sm:w-auto"
                 >
-                  🗑️ Delete Task Entry
+                  <FaTrash className="text-xs" /> Delete Task Entry
                 </button>
               </div>
             </div>
           ) : (
             <div className="text-slate-500 text-xs font-medium">
-              <div>🔍 Task Details Stream Offline</div>
+              <div className="flex items-center gap-2">
+                <FaSearchMinus className="text-sm opacity-70" /> Task Details Stream Offline
+              </div>
               <p className="mt-1 text-[11px] text-slate-400/60 font-normal">
                 Select any task row tracking entity node on the left list to initialize details view
                 telemetry.
