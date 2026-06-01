@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './components/layout/Sidebar';
-import { StatsGrid } from './features/tasks/components/StatsGrid';
 import AllTasksView from './features/tasks/components/AllTasksView';
 import TaskForm from './features/tasks/components/TaskForm';
-import { TaskBoardView } from './features/tasks/components/TaskBoardView';
+import DashboardContainer from './features/tasks/components/Dashboard/DashboardContainer';
 import type { Task, FilterStatus } from './features/tasks/types/task.types';
 
 import { useTaskOperations } from './features/tasks/hooks/useTaskOperations';
@@ -15,6 +14,7 @@ const App = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const { tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask } =
     useTaskOperations();
+
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -46,37 +46,30 @@ const App = () => {
         setStatusFilter={setStatusFilter}
       />
 
-      <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto overflow-x-hidden">
+      <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto overflow-x-hidden space-y-6">
         {/* Network Error Banner Notification */}
         {error && (
           <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl">
             ⚠️ {error}
           </div>
         )}
+
         {/* Global Loading Feedback Indicator */}
         {isLoading && (
           <div className="text-xs text-indigo-400 font-bold tracking-widest animate-pulse uppercase">
             Syncing System Database...
           </div>
         )}
+
+        {/* ⚡ COMBINED DASHBOARD RENDERING ROUTE ELEMENT */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-8">
-            <StatsGrid
-              darkMode={darkMode}
-              setActiveTab={setActiveTab}
-              setStatusFilter={setStatusFilter}
-              tasksCount={taskCount}
-            />
-          </div>
-        )}
-        {activeTab === 'dashboard' && (
-          <TaskBoardView
+          <DashboardContainer
             darkMode={darkMode}
-            tasks={tasks} // ⚡ Passing the managed dynamic database list array down
-            onEditSelect={(task) => {
-              setEditingTask(task);
-              setActiveTab('add-task'); // Redirects to the form with the selected node context prefilled
-            }}
+            tasks={tasks}
+            setActiveTab={setActiveTab}
+            setStatusFilter={setStatusFilter}
+            onEditSelect={handleEditSelect}
+            taskCount={taskCount}
           />
         )}
 

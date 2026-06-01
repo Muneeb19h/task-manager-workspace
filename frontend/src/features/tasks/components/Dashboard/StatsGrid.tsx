@@ -1,5 +1,5 @@
 import React from 'react';
-import type { StatsGridProps, FilterStatus } from '../types/task.types';
+import type { StatsGridProps, FilterStatus } from '../../types/task.types';
 
 export const StatsGrid: React.FC<StatsGridProps> = ({
   darkMode,
