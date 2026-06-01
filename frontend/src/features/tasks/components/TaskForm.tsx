@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { TaskFormProps, TaskStatus } from '../types/task.types';
-
 import { FormSelect } from '../../../components/ui/FormSelect';
 import { taskFormStyles as styles } from '../styles/TaskForm.styles';
 import { FaHourglassHalf, FaBolt, FaCheckCircle, FaSave, FaPlus } from 'react-icons/fa';

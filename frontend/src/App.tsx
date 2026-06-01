@@ -3,7 +3,7 @@ import Sidebar from './components/layout/Sidebar';
 import { StatsGrid } from './features/tasks/components/StatsGrid';
 import AllTasksView from './features/tasks/components/AllTasksView';
 import TaskForm from './features/tasks/components/TaskForm';
-import TaskList from './features/tasks/components/TaskList';
+import { TaskBoardView } from './features/tasks/components/TaskBoardView';
 import type { Task, FilterStatus } from './features/tasks/types/task.types';
 
 import { useTaskOperations } from './features/tasks/hooks/useTaskOperations';
@@ -84,8 +84,17 @@ const App = () => {
               setStatusFilter={setStatusFilter}
               tasksCount={taskCount}
             />
-            <TaskList darkMode={darkMode} />
           </div>
+        )}
+        {activeTab === 'dashboard' && (
+          <TaskBoardView
+            darkMode={darkMode}
+            tasks={tasks} // ⚡ Passing the managed dynamic database list array down
+            onEditSelect={(task) => {
+              setEditingTask(task);
+              setActiveTab('add-task'); // Redirects to the form with the selected node context prefilled
+            }}
+          />
         )}
 
         {activeTab === 'all-tasks' && (

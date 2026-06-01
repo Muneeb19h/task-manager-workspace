@@ -61,7 +61,15 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+    # partial update task state modification
+    def patch(self, request, pk):
+        task = self.get_object(pk)
+        # partial=True flags the serializer to allow selective field updates
+        serializer = self.get_serializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     #Delete a Task
     def delete(self,request,pk):
         task=self.get_object(pk)

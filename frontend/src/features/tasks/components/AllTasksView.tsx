@@ -8,8 +8,8 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
   statusFilter,
   setStatusFilter,
   onEditSelect,
-  onDeleteTask, // ⚡ Connected from App.tsx orchestration hook
-  onUpdateStatus, // ⚡ Connected from App.tsx orchestration hook
+  onDeleteTask,
+  onUpdateStatus,
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 

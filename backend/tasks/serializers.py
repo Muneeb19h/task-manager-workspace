@@ -11,6 +11,10 @@ class TaskSerializer(serializers.ModelSerializer):
         
         #Due date validations (No past dates)
     def validate_due_date(self,value):
+        if self.instance:
+            # If the date hasn't been changed by the user, let it pass cleanly
+            if self.instance.due_date == value:
+                return value
         if value< timezone.now().date():
             raise serializers.ValidationError("The due date cannot be set in the past")
         return value
@@ -23,6 +27,8 @@ class TaskSerializer(serializers.ModelSerializer):
     
     # in description only meaningful notes should be provided
     def validate_description(self,value):
+        if not value or len(value.strip()) == 0:
+            return ""
         if value and len(value.strip())<10:
             raise serializers.ValidationError("If description is provided, it must be 10 Characters long")
         return value
