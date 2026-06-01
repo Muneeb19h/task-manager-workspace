@@ -1,37 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import { StatsGrid } from './features/tasks/components/StatsGrid';
 import AllTasksView from './features/tasks/components/AllTasksView';
 import TaskForm from './features/tasks/components/TaskForm';
 import TaskList from './features/tasks/components/TaskList';
-import type { TabId, Task, FilterStatus } from './types/layout';
+import type { Task, FilterStatus } from './features/tasks/types/task.types';
+
+import { useTaskOperations } from './features/tasks/hooks/useTaskOperations';
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'all-tasks' | 'add-task'>('dashboard');
   const [darkMode, setDarkMode] = useState<boolean>(true);
-
-  // Shared state tracking for our workflow ledger
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('All');
-  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const { tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask } =
+    useTaskOperations();
+  // const tasks: Task[] = [
+  //   {
+  //     id: '1',
+  //     title: 'Configure Django CORS Whitelist',
+  //     description: 'Secure connection variables rules across API headers.',
+  //     status: 'Pending',
+  //     dueDate: '2026-06-05',
+  //   },
+  //   {
+  //     id: '2',
+  //     title: 'Integrate React Bits Interactive Layouts',
+  //     description: 'Assemble premium metrics analytics boards.',
+  //     status: 'In Progress',
+  //     dueDate: '2026-06-12',
+  //   },
+  // ];
 
-  const tasks: Task[] = [
-    {
-      id: '1',
-      title: 'Configure Django CORS Whitelist',
-      description: 'Secure connection variables rules across API headers.',
-      status: 'Pending',
-      priority: 'Medium',
-      dueDate: '2026-06-05',
-    },
-    {
-      id: '2',
-      title: 'Integrate React Bits Interactive Layouts',
-      description: 'Assemble premium metrics analytics boards.',
-      status: 'In Progress',
-      priority: 'High',
-      dueDate: '2026-06-12',
-    },
-  ];
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const handleEditSelect = (task: Task) => {
     setEditingTask(task);
@@ -61,6 +64,18 @@ const App = () => {
       />
 
       <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto overflow-x-hidden">
+        {/* Network Error Banner Notification */}
+        {error && (
+          <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl">
+            ⚠️ {error}
+          </div>
+        )}
+        {/* Global Loading Feedback Indicator */}
+        {isLoading && (
+          <div className="text-xs text-indigo-400 font-bold tracking-widest animate-pulse uppercase">
+            Syncing System Database...
+          </div>
+        )}
         {activeTab === 'dashboard' && (
           <div className="space-y-8">
             <StatsGrid
@@ -80,17 +95,20 @@ const App = () => {
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
             onEditSelect={handleEditSelect}
+            onDeleteTask={deleteTask}
+            onUpdateStatus={updateTask}
           />
         )}
 
         {activeTab === 'add-task' && (
           <TaskForm
             darkMode={darkMode}
-            initialTask={editingTask}
-            onTaskCreated={() => {
-              setEditingTask(undefined);
-              setActiveTab('dashboard');
-            }}
+            key={editingTask ? editingTask.id : 'new-task'}
+            editingTask={editingTask}
+            setEditingTask={setEditingTask}
+            onCreateTask={createTask}
+            onUpdateTask={updateTask}
+            setActiveTab={setActiveTab}
           />
         )}
       </main>

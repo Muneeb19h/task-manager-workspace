@@ -1,38 +1,27 @@
 import React, { useState } from 'react';
 import type { TaskFormProps, TaskStatus } from '../types/task.types';
-import type { FormOption } from '../../../components/ui/types/form.types';
+
 import { FormSelect } from '../../../components/ui/FormSelect';
 import { taskFormStyles as styles } from '../styles/TaskForm.styles';
-import {
-  FaHourglassHalf,
-  FaBolt,
-  FaCheckCircle,
-  FaArrowCircleDown,
-  FaMinusCircle,
-  FaExclamationCircle,
-  FaTrashAlt,
-  FaSave,
-  FaPlus,
-} from 'react-icons/fa';
+import { FaHourglassHalf, FaBolt, FaCheckCircle, FaSave, FaPlus } from 'react-icons/fa';
 
 export const TaskForm: React.FC<TaskFormProps> = ({
   darkMode,
-  onTaskCreated,
-  initialTask,
-  onDelete,
+  editingTask,
+  setEditingTask,
+  onCreateTask,
+  onUpdateTask,
+  setActiveTab,
 }) => {
-  const isUpdateMode = !!initialTask;
+  const [title, setTitle] = useState(editingTask ? editingTask.title : '');
+  const [description, setDescription] = useState(editingTask ? editingTask.description : '');
+  const [status, setStatus] = useState<TaskStatus>(editingTask ? editingTask.status : 'Pending');
+  const [dueDate, setDueDate] = useState(editingTask ? editingTask.dueDate : '');
 
-  const [title, setTitle] = useState(initialTask?.title || '');
-  const [description, setDescription] = useState(initialTask?.description || '');
-  const [status, setStatus] = useState<TaskStatus>(initialTask?.status || 'Pending');
-  const [priority, setPriority] = useState<'Low' | 'Medium' | 'High'>(
-    initialTask?.priority || 'Medium'
-  );
-  const [dueDate, setDueDate] = useState(initialTask?.dueDate || '');
+  const isUpdateMode = !!editingTask;
 
   // Status Options Map Configuration
-  const statusOptions: FormOption[] = [
+  const statusOptions = [
     {
       value: 'Pending',
       label: 'Pending',
@@ -50,25 +39,29 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     },
   ];
 
-  // Priority Options Map Configuration
-  const priorityOptions: FormOption[] = [
-    { value: 'Low', label: 'Low', icon: <FaArrowCircleDown className="text-slate-400 text-xs" /> },
-    {
-      value: 'Medium',
-      label: 'Medium',
-      icon: <FaMinusCircle className="text-amber-500 text-xs" />,
-    },
-    {
-      value: 'High',
-      label: 'High',
-      icon: <FaExclamationCircle className="text-rose-500 text-xs" />,
-    },
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting Task Data:', { title, description, status, priority, dueDate });
-    onTaskCreated();
+    if (!title || !dueDate) return;
+
+    // 💡 FIX: Removed the unused standalone variable tracking to satisfy the compiler rule.
+    if (editingTask) {
+      const isUpdated = await onUpdateTask(editingTask.id, { title, description, status, dueDate });
+      if (isUpdated) {
+        setEditingTask(null);
+        setActiveTab('all-tasks');
+      }
+    } else {
+      const isCreated = await onCreateTask({ title, description, status, dueDate });
+      if (isCreated) {
+        setEditingTask(null);
+        setActiveTab('all-tasks');
+      }
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingTask(null);
+    setActiveTab('all-tasks');
   };
 
   return (
@@ -114,20 +107,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             darkMode={darkMode}
             selectedValue={status}
             options={statusOptions}
-            // ⚡ Type-safe handler conversion without using raw 'as any' casting tricks
             onSelectChange={(val: string) => setStatus(val as TaskStatus)}
           />
-
-          {/* Custom Priority Component Selector */}
-          <FormSelect
-            labelTitle="Priority"
-            darkMode={darkMode}
-            selectedValue={priority}
-            options={priorityOptions}
-            // ⚡ Type-safe handler conversion without using raw 'as any' casting tricks
-            onSelectChange={(val: string) => setPriority(val as 'Low' | 'Medium' | 'High')}
-          />
-
           {/* Due Date Field Container */}
           <div className="space-y-2">
             <label className={styles.label(darkMode)}>Due Date</label>
@@ -142,20 +123,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-800/10">
-          <div>
-            {isUpdateMode && onDelete && (
-              <button
-                type="button"
-                onClick={() => onDelete(initialTask.id)}
-                className={styles.btnDelete}
-              >
-                <FaTrashAlt className="text-xs" /> Delete Task Entry
-              </button>
-            )}
-          </div>
+          <div />
 
           <div className="flex items-center gap-3 justify-end w-full sm:w-auto">
-            <button type="button" onClick={onTaskCreated} className={styles.btnSecondary(darkMode)}>
+            <button type="button" onClick={handleCancel} className={styles.btnSecondary(darkMode)}>
               Cancel
             </button>
             <button type="submit" className={styles.btnPrimary}>

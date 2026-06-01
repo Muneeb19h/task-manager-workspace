@@ -7,7 +7,6 @@ export interface Task {
   title: string;
   description: string;
   status: TaskStatus;
-  priority: 'Low' | 'Medium' | 'High';
   dueDate: string;
 }
 
@@ -28,13 +27,22 @@ export interface AllTasksProps {
   statusFilter: FilterStatus;
   setStatusFilter: (status: FilterStatus) => void;
   onEditSelect: (task: Task) => void;
+  onDeleteTask: (id: string) => Promise<boolean>;
+  onUpdateStatus: (id: string, payload: Partial<Task>) => Promise<boolean>;
 }
 
 export interface TaskFormProps {
   darkMode: boolean;
-  onTaskCreated: () => void;
-  initialTask?: Task;
-  onDelete?: (id: string) => void;
+  editingTask: Task | null;
+  setEditingTask: (task: Task | null) => void;
+  onCreateTask: (payload: {
+    title: string;
+    description?: string;
+    status: TaskStatus;
+    dueDate: string;
+  }) => Promise<boolean>;
+  onUpdateTask: (id: string, payload: Partial<Task>) => Promise<boolean>;
+  setActiveTab: (tab: 'dashboard' | 'all-tasks' | 'add-task') => void;
 }
 
 export interface StatsGridProps {

@@ -21,7 +21,7 @@ class TaskListCreateAPIView(TaskBaseAPIView):
     
     #List all tasks
     def get(self,request):
-        tasks=Task.objects.all().order_by('-created-at') 
+        tasks=Task.objects.all().order_by('-created_at') 
         serializer=self.get_serializer(tasks,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     

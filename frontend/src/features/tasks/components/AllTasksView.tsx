@@ -8,6 +8,8 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
   statusFilter,
   setStatusFilter,
   onEditSelect,
+  onDeleteTask, // ⚡ Connected from App.tsx orchestration hook
+  onUpdateStatus, // ⚡ Connected from App.tsx orchestration hook
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
@@ -15,6 +17,27 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
   const filteredTasks = tasks.filter(
     (task) => statusFilter === 'All' || task.status === statusFilter
   );
+
+  // Find live task information to keep details view synced post-mutation
+  const activeTaskDetails = tasks.find((t) => t.id === selectedTask?.id) || selectedTask;
+
+  const handleStatusCycle = async (task: Task) => {
+    let nextStatus: 'Pending' | 'In Progress' | 'Completed' = 'Pending';
+    if (task.status === 'Pending') nextStatus = 'In Progress';
+    if (task.status === 'In Progress') nextStatus = 'Completed';
+
+    const success = await onUpdateStatus(task.id, { status: nextStatus });
+    if (success) {
+      setSelectedTask({ ...task, status: nextStatus });
+    }
+  };
+
+  const handleDeleteTrigger = async (id: string) => {
+    const success = await onDeleteTask(id);
+    if (success) {
+      setSelectedTask(null); // Safely drop state panel view node to avoid ghost data streams
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -57,7 +80,6 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
               >
                 <tr>
                   <th className="p-4">Task Details</th>
-                  <th className="p-4">Priority</th>
                   <th className="p-4">Due Date</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
@@ -68,7 +90,7 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                     key={task.id}
                     onClick={() => setSelectedTask(task)}
                     className={`cursor-pointer transition-colors ${
-                      selectedTask?.id === task.id
+                      activeTaskDetails?.id === task.id
                         ? darkMode
                           ? 'bg-indigo-600/10'
                           : 'bg-indigo-50'
@@ -80,17 +102,6 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                     <td className="p-4">
                       <div className="font-bold tracking-tight">{task.title}</div>
                       <div className="text-xs text-slate-400 font-mono mt-0.5">{task.status}</div>
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ${
-                          task.priority === 'High'
-                            ? 'bg-rose-500/10 text-rose-500'
-                            : 'bg-slate-500/10 text-slate-400'
-                        }`}
-                      >
-                        {task.priority}
-                      </span>
                     </td>
                     <td className="p-4 font-mono text-xs">{task.dueDate}</td>
                     <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
@@ -118,14 +129,16 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
               : 'opacity-50 border-dashed border-slate-700/40 text-center py-12'
           }`}
         >
-          {selectedTask ? (
+          {selectedTask && activeTaskDetails ? (
             <div className="space-y-4">
               <div className="flex justify-between items-start border-b border-slate-800/10 pb-3">
                 <div>
                   <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-500 uppercase">
                     Selected Identity Node
                   </span>
-                  <h3 className="text-base font-black tracking-tight mt-1">{selectedTask.title}</h3>
+                  <h3 className="text-base font-black tracking-tight mt-1">
+                    {activeTaskDetails.title}
+                  </h3>
                 </div>
                 <button
                   onClick={() => setSelectedTask(null)}
@@ -140,7 +153,7 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                   Functional Blueprint Scope
                 </h4>
                 <p className="text-xs leading-relaxed text-slate-300 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
-                  {selectedTask.description ||
+                  {activeTaskDetails.description ||
                     'No metadata description constraints attached to this system entry.'}
                 </p>
               </div>
@@ -150,14 +163,29 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
                   <span className="block text-[10px] text-slate-400 font-bold uppercase">
                     Status State
                   </span>
-                  <span className="font-medium mt-1 inline-block">{selectedTask.status}</span>
+                  <button
+                    onClick={() => handleStatusCycle(activeTaskDetails)}
+                    className="font-medium mt-1 inline-block text-indigo-400 hover:underline text-left cursor-pointer"
+                  >
+                    {activeTaskDetails.status} 🔄
+                  </button>
                 </div>
                 <div>
                   <span className="block text-[10px] text-slate-400 font-bold uppercase">
                     Deadline target
                   </span>
-                  <span className="font-mono mt-1 inline-block">{selectedTask.dueDate}</span>
+                  <span className="font-mono mt-1 inline-block">{activeTaskDetails.dueDate}</span>
                 </div>
+              </div>
+
+              {/* Functional Dynamic Inline Actions Wrapper Footer */}
+              <div className="pt-4 border-t border-slate-800/10 flex justify-end">
+                <button
+                  onClick={() => handleDeleteTrigger(activeTaskDetails.id)}
+                  className="px-3 py-1.5 bg-rose-950/40 border border-rose-900/40 text-rose-400 text-xs font-bold rounded-lg hover:bg-rose-900/40 transition-colors w-full sm:w-auto"
+                >
+                  🗑️ Delete Task Entry
+                </button>
               </div>
             </div>
           ) : (
