@@ -1,12 +1,14 @@
 from django.db import models
 
 
+class StatusChoices(models.TextChoices):
+    PENDING='Pending','Pending'
+    IN_PROGRESS='In Progress','In Progress'
+    COMPLETED='Completed','Completed'
+    
+    
 class Task(models.Model):
     #choices for status
-    class StatusChoices(models.TextChoices):
-        PENDING='Pending','Pending'
-        IN_PROGRESS='In Progress','In Progress'
-        COMPLETED='Completed','Completed'
     title=models.CharField(max_length=200)
     description=models.TextField(blank=True,null=True)
     status=models.CharField(max_length=20,choices=StatusChoices.choices,default=StatusChoices.PENDING)

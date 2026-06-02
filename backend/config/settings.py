@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 import environ
 import os
@@ -114,7 +114,25 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+# 1. Register SimpleJWT in REST_FRAMEWORK configurations
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', # Protects all endpoints by default
+    ],
+}
+# 2. Configure Token Lifetimes and Properties
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),    # Short-lived access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),       # Long-lived refresh session
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),                  # Front-end header format: "Bearer <token>"
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
