@@ -151,10 +151,20 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
               </div>
 
               <div>
-                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">
+                <h4
+                  className={`text-[10px] font-black uppercase tracking-wider mb-2 font-mono ${
+                    darkMode ? 'text-slate-500' : 'text-slate-400'
+                  }`}
+                >
                   Functional Blueprint Scope
                 </h4>
-                <p className="text-xs leading-relaxed text-slate-300 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+                <p
+                  className={`text-xs leading-relaxed p-4 rounded-xl border transition-colors duration-200 ${
+                    darkMode
+                      ? 'text-slate-300 bg-slate-950/40 border-slate-800/60'
+                      : 'text-slate-600 bg-slate-100/70 border-slate-200/80'
+                  }`}
+                >
                   {activeTaskDetails.description ||
                     'No metadata description constraints attached to this system entry.'}
                 </p>

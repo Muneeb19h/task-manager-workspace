@@ -12,7 +12,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   totalTasks,
   pendingTasks,
 }) => {
-  // ⚡ Fixed: Evaluated instantly as a constant value so the linter tracks it flawlessly
+  //Fixed: Evaluated instantly as a constant value so the linter tracks it flawlessly
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
@@ -21,7 +21,13 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const currentTime = new Date().toLocaleDateString('en-US', options);
 
   return (
-    <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 rounded-2xl border transition-all duration-200 bg-gradient-to-r from-slate-900/5 via-transparent to-transparent border-slate-800/10 dark:from-slate-900/40 dark:border-slate-800/60">
+    <div
+      className={`mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 rounded-2xl border transition-all duration-200 ${
+        darkMode
+          ? 'bg-gradient-to-r from-slate-900/40 dark:border-slate-800/60'
+          : 'bg-gradient-to-r from-indigo-500/10 via-indigo-500/[0.02] to-transparent border-slate-200/80 shadow-sm'
+      }`}
+    >
       <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <div className="flex items-center justify-center h-5 w-5 rounded bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 font-mono text-[10px] border border-indigo-500/20">
