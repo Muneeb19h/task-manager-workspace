@@ -9,7 +9,6 @@ export const CustomStatusSelect: React.FC<CustomStatusSelectProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Map out configs for cleaner rendering loops
   const options = [
     {
       value: 'All' as FilterStatus,
@@ -36,7 +35,8 @@ export const CustomStatusSelect: React.FC<CustomStatusSelectProps> = ({
   const currentSelection = options.find((opt) => opt.value === statusFilter) || options[0];
 
   return (
-    <div className="relative z-50 w-56">
+    /* 📉 Step 1: Changed outer layout wrapper from z-50 down to z-20 */
+    <div className="relative z-20 w-56">
       {/* Active Selection Button Wrapper */}
       <button
         type="button"
@@ -59,11 +59,12 @@ export const CustomStatusSelect: React.FC<CustomStatusSelectProps> = ({
       {/* Floating Menu Popover Panel */}
       {isOpen && (
         <>
-          {/* Transparent click overlay to close dropdown when clicking outside */}
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          {/* 📉 Step 2: Set click overlay wrapper mask background layer to z-20 */}
+          <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
 
+          {/* 📉 Step 3: Changed dropdown floating panel popover container from z-50 to z-30 */}
           <div
-            className={`absolute left-0 right-0 mt-2 p-1.5 rounded-xl border shadow-xl z-50 animate-fadeIn ${
+            className={`absolute left-0 right-0 mt-2 p-1.5 rounded-xl border shadow-xl z-30 animate-fadeIn ${
               darkMode ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
             }`}
           >
@@ -72,7 +73,7 @@ export const CustomStatusSelect: React.FC<CustomStatusSelectProps> = ({
                 key={option.value}
                 type="button"
                 onClick={() => {
-                  setStatusFilter(option.value); // Set exact typed parameter values securely
+                  setStatusFilter(option.value);
                   setIsOpen(false);
                 }}
                 className={`w-full px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-2.5 transition-colors ${
