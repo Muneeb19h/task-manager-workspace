@@ -6,19 +6,22 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
   onSwitchToLogin,
 }) => {
   const [username, setUsername] = useState('');
-  const [firstName, setFirstName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
+    if (password !== confirmPassword) {
+      setMessage('Passwords do not match');
+      return;
+    }
     try {
       await axios.post('http://127.0.0.1:8000/api/register/', {
         username,
         password,
-        first_name: firstName,
       });
       setIsSuccess(true);
       setMessage('Registration complete! Redirecting to access gate...');
@@ -53,19 +56,6 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
         <div className="space-y-4">
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-              First Name
-            </label>
-            <input
-              type="text"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className={`w-full px-4 py-2.5 rounded-xl text-xs font-medium border outline-none ${darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200'}`}
-              placeholder="e.g. John"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Username
             </label>
             <input
@@ -86,6 +76,19 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className={`w-full px-4 py-2.5 rounded-xl text-xs font-medium border outline-none ${darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200'}`}
+              placeholder="••••••••"
+            />
+          </div>
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className={`w-full px-4 py-2.5 rounded-xl text-xs font-medium border outline-none ${darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200'}`}
               placeholder="••••••••"
             />

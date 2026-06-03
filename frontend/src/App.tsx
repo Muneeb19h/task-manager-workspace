@@ -140,7 +140,9 @@ const MainAppContent = () => {
                   Node Operator Alias
                 </span>
                 <p className="text-sm font-semibold capitalize text-indigo-500 dark:text-indigo-400">
-                  {user?.firstName || 'Developer'}
+                  {user?.username
+                    ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
+                    : 'Developer'}
                 </p>
               </div>
 

@@ -26,11 +26,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
         password,
       });
 
-      // 🌟 Extract and format the user's first name dynamically from the username input field
-      const dynamicFirstName = username.charAt(0).toUpperCase() + username.slice(1);
-
-      // 🌟 Pass all 4 parameters down into your newly designed AuthContext state sequence
-      login(response.data.access, response.data.refresh, dynamicFirstName, username);
+      // Pass credentials and username into auth context (we'll display username capitalized)
+      login(response.data.access, response.data.refresh, username);
     } catch (err: unknown) {
       if (
         typeof err === 'object' &&

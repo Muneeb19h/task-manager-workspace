@@ -48,7 +48,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         >
           {greeting}, {/* 🌟 Dynamic context name display with automatic fallback */}
           <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent capitalize">
-            {user?.firstName || 'Developer'}
+            {user?.username
+              ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
+              : 'Developer'}
           </span>{' '}
           👋
         </h1>

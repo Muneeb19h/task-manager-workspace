@@ -82,7 +82,6 @@ class UserRegisterAPIView(APIView):
     def post(self,request):
         username=request.data.get('username')
         password=request.data.get('password')
-        first_name=request.data.get('first_name','')
         if not username or not password:
             return Response(
                 {"error":"Username and Password are required"},
@@ -102,7 +101,7 @@ class UserRegisterAPIView(APIView):
         return Response(
             {
                 "message": "User node initialized successfully.",
-                "user": {"username": user.username, "first_name": user.first_name}
+                "user": {"username": user.username}
             }, 
             status=status.HTTP_201_CREATED
         )

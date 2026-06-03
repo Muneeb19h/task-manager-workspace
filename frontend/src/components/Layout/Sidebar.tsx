@@ -183,10 +183,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           >
             <div className={styles.profileIconContainer(activeTab === 'profile', darkMode)}>
               {/* Render User initial capital node tag letter dynamically */}
-              {user?.firstName?.charAt(0).toUpperCase() || 'D'}
+              {user?.username?.charAt(0).toUpperCase() || 'D'}
             </div>
             <div className="truncate">
-              <div className={styles.profileName(darkMode)}>{user?.firstName || 'Developer'}</div>
+              <div className={styles.profileName(darkMode)}>
+                {user?.username
+                  ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
+                  : 'Developer'}
+              </div>
               <div className="text-[10px] text-indigo-500 font-bold tracking-wider font-mono uppercase">
                 Active Operator
               </div>
