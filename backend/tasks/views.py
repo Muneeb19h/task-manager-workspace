@@ -3,6 +3,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import SessionAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Task
@@ -13,7 +15,7 @@ from .serializers import TaskSerializer
 class TaskBaseAPIView(APIView):
     #registring serializer class globally
     serializer_class=TaskSerializer
-
+    authentication_classes = [JWTAuthentication, SessionAuthentication]
     permission_classes = [IsAuthenticated]
     #Feeding metadata to Borwser UI for form Design
     def get_serializer(self,*args,**kwargs):
