@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from 'react';
 import type { TaskFormProps, TaskStatus } from '../types/task.types';
 import { FormSelect } from '../../../components/ui/FormSelect';
@@ -41,6 +42,15 @@ export const TaskForm: React.FC<TaskFormProps> = ({
     },
   ];
 
+  // Clear local validation alerts whenever input data changes
+  const handleInputChange = (
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    value: string
+  ) => {
+    setter(value);
+    if (localError) setLocalError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !dueDate) return;
@@ -50,29 +60,32 @@ export const TaskForm: React.FC<TaskFormProps> = ({
 
     try {
       if (editingTask) {
-        const isUpdated = await onUpdateTask(editingTask.id, {
+        const result = await onUpdateTask(editingTask.id, {
           title,
           description,
           status,
           dueDate,
         });
-        if (isUpdated) {
+        if (result.success) {
           setEditingTask(null);
           setActiveTab('all-tasks');
         } else {
-          // Pulling error context back to form UI if operation returned false due to validation
-          setLocalError('The due date cannot be set in the past');
+          setLocalError(
+            result.error || 'Failed to modify task properties. Please verify parameters or date rules.'
+          );
         }
       } else {
-        const isCreated = await onCreateTask({ title, description, status, dueDate });
-        if (isCreated) {
+        const result = await onCreateTask({ title, description, status, dueDate });
+        if (result.success) {
           setEditingTask(null);
           setActiveTab('all-tasks');
         } else {
-          setLocalError('The due date cannot be set in the past');
+          setLocalError(
+            result.error ||
+              'Could not process task deployment entry. Verify authentication or form criteria.'
+          );
         }
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setLocalError('An error occurred while saving the task registry configuration.');
     } finally {
@@ -113,7 +126,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             required
             disabled={isSubmitting}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => handleInputChange(setTitle, e.target.value)}
             className={styles.input(darkMode)}
           />
         </div>
@@ -124,7 +137,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
             rows={3}
             disabled={isSubmitting}
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => handleInputChange(setDescription, e.target.value)}
             className={styles.input(darkMode)}
           />
         </div>
@@ -145,7 +158,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({
               required
               disabled={isSubmitting}
               value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
+              onChange={(e) => handleInputChange(setDueDate, e.target.value)}
               className={styles.input(darkMode)}
             />
           </div>

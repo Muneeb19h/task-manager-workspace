@@ -40,8 +40,11 @@ export interface TaskFormProps {
     description?: string;
     status: TaskStatus;
     dueDate: string;
-  }) => Promise<boolean>;
-  onUpdateTask: (id: string, payload: Partial<Task>) => Promise<boolean>;
+  }) => Promise<{ success: boolean; error?: string }>;
+  onUpdateTask: (
+    id: string,
+    payload: Partial<Task>
+  ) => Promise<{ success: boolean; error?: string }>;
   setActiveTab: (tab: 'dashboard' | 'all-tasks' | 'add-task') => void;
 }
 

@@ -1,3 +1,5 @@
+from django.contrib.auth.models import User
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -37,22 +39,18 @@ class TaskListCreateAPIView(TaskBaseAPIView):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
     
-    
-    
-    
-    
 # Detail, Update & Delete View
 class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
 
-    #replacing repeatation with one get_obj func(for 404)
-    def get_object(self,pk,user):
-        return get_object_or_404(Task,pk=pk,user=user)
+    # Replace repeated lookup logic with one helper that applies request user filtering
+    def get_object(self, pk):
+        return get_object_or_404(Task, pk=pk, user=self.request.user)
     
-    #reterive single task
-    def get(self,request,pk):
-       task=self.get_object(pk)
-       serializer=self.get_serializer(task)
-       return Response(serializer.data,status=status.HTTP_200_OK)
+    # Retrieve single task
+    def get(self, request, pk):
+       task = self.get_object(pk)
+       serializer = self.get_serializer(task)
+       return Response(serializer.data, status=status.HTTP_200_OK)
     
     #update task
     def put(self,request,pk):
@@ -77,3 +75,34 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
         task=self.get_object(pk)
         task.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    
+class UserRegisterAPIView(APIView):
+    permission_classes=[AllowAny]
+    def post(self,request):
+        username=request.data.get('username')
+        password=request.data.get('password')
+        first_name=request.data.get('first_name','')
+        if not username or not password:
+            return Response(
+                {"error":"Username and Password are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        if User.objects.filter(username=username).exists():
+            return Response(
+                    {"error":"Username and passowrd are required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        user=User.objects.create_user(
+            username=username,
+            password=password
+        )
+        
+        return Response(
+            {
+                "message": "User node initialized successfully.",
+                "user": {"username": user.username, "first_name": user.first_name}
+            }, 
+            status=status.HTTP_201_CREATED
+        )

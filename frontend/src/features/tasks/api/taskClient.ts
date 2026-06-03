@@ -9,26 +9,60 @@ export const taskClient = axios.create({
   },
 });
 
-taskClient.interceptors.response.use((response) => {
-  // If the response is a list of tasks from Django
-  if (Array.isArray(response.data)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    response.data = response.data.map((djangoTask: any) => ({
-      id: String(djangoTask.id), // Safely converts Django's integer primary key to string
-      title: djangoTask.title,
-      description: djangoTask.description || '',
-      status: djangoTask.status,
-      dueDate: djangoTask.due_date || djangoTask.dueDate, // Handles Django snake_case due_date
-    }));
-    // If the response is a single task object (from POST or PUT requests)
-  } else if (response.data && typeof response.data === 'object') {
-    response.data = {
-      id: String(response.data.id),
-      title: response.data.title,
-      description: response.data.description || '',
-      status: response.data.status,
-      dueDate: response.data.due_date || response.data.dueDate,
-    };
+taskClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('access_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return response;
-});
+);
+
+// GUARD: Ensure response parsing only triggers for legitimate successful payloads
+taskClient.interceptors.response.use(
+  (response) => {
+    // 1. If the request URL contains 'token', bypass mapping completely
+    if (response.config.url?.includes('token')) {
+      return response;
+    }
+
+    // 2. If the response data is an array (TaskList API view)
+    if (Array.isArray(response.data)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      response.data = response.data.map((djangoTask: any) => ({
+        id: String(djangoTask.id),
+        title: djangoTask.title,
+        description: djangoTask.description || '',
+        status: djangoTask.status,
+        dueDate: djangoTask.due_date || djangoTask.dueDate,
+      }));
+    }
+    // 3. Only parse as a single task if it looks like a valid task object (has an id or title)
+    // This prevents parsing Django error structures like { detail: "..." }
+    else if (
+      response.data &&
+      typeof response.data === 'object' &&
+      ('id' in response.data || 'title' in response.data)
+    ) {
+      response.data = {
+        id: String(response.data.id),
+        title: response.data.title,
+        description: response.data.description || '',
+        status: response.data.status,
+        dueDate: response.data.due_date || response.data.dueDate,
+      };
+    }
+
+    return response;
+  },
+  (error) => {
+    // Pass errors straight down to the catch block in useTaskOperations where they belong!
+    return Promise.reject(error);
+  }
+);
+
+export default taskClient;

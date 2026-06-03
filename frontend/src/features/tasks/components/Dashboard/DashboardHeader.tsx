@@ -1,5 +1,7 @@
 import React from 'react';
 import { FaTerminal, FaCalendarAlt } from 'react-icons/fa';
+// 🌟 Corrected typo import to pull useAuth cleanly
+import { useAuth } from '../../../auth/context/AuthContext';
 
 interface DashboardHeaderProps {
   darkMode: boolean;
@@ -12,7 +14,10 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   totalTasks,
   pendingTasks,
 }) => {
-  //Fixed: Evaluated instantly as a constant value so the linter tracks it flawlessly
+  // 🌟 Extract the active user state context parameters
+  const { user } = useAuth();
+
+  // Evaluated instantly as a constant value so the linter tracks it flawlessly
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
@@ -41,9 +46,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <h1
           className={`text-2xl md:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}
         >
-          {greeting},{' '}
-          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
-            Developer
+          {greeting}, {/* 🌟 Dynamic context name display with automatic fallback */}
+          <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent capitalize">
+            {user?.firstName || 'Developer'}
           </span>{' '}
           👋
         </h1>

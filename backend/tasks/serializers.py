@@ -8,7 +8,10 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = '__all__'
-        
+        extra_kwargs = {
+            'user': {'read_only': True},
+        }
+
         #Due date validations (No past dates)
     def validate_due_date(self,value):
         if self.instance:

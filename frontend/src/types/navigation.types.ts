@@ -1,4 +1,4 @@
-export type TabId = 'dashboard' | 'add-task' | 'all-tasks';
+export type TabId = 'dashboard' | 'add-task' | 'all-tasks' | 'profile';
 
 export interface NavigationConfig {
   activeTab: TabId;

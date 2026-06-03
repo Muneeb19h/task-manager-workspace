@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import type { SidebarProps } from './types/sidebar.types';
 import type { TabId } from '../../types/navigation.types';
 import { sidebarStyles as styles } from './Sidebar.styles';
+import { useAuth } from '../../features/auth/context/AuthContext'; // 🌟 Import your authentication core context hook
 import {
   FaThLarge,
   FaListUl,
   FaPlusCircle,
   FaSun,
   FaMoon,
-  FaUserAlt,
   FaBars,
   FaTimes,
   FaCheckDouble,
@@ -28,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setStatusFilter,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAuth(); // 🌟 Extract user session data
 
   const menuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <FaThLarge /> },
@@ -52,7 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/*Mobile Context Menu Header */}
+      {/* Mobile Context Menu Header */}
       <header
         className={`lg:hidden w-full p-4 flex items-center justify-between border-b sticky top-0 z-40 backdrop-blur-md ${
           darkMode
@@ -100,7 +101,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside className={styles.container(darkMode, isOpen)}>
         <div>
           <div className="flex items-center justify-between mb-8 px-2">
-            {/*CLICKABLE LOGO FOR DESKTOP DRAWER */}
+            {/* CLICKABLE LOGO FOR DESKTOP DRAWER */}
             <div
               onClick={handleLogoRedirect}
               className="flex items-center gap-3 cursor-pointer group w-full"
@@ -174,14 +175,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          <div className={styles.profileContainer(darkMode)}>
-            <div className={styles.profileIconContainer(darkMode)}>
-              <FaUserAlt />
+          {/* 🌟 Upgraded Interactive Bottom Identity Card Component */}
+          {/* Note: In your routing types, ensure 'profile' is added to TabId string types! */}
+          <div
+            onClick={() => handleNavClick('profile' as TabId)}
+            className={styles.profileContainer(activeTab === 'profile', darkMode)}
+          >
+            <div className={styles.profileIconContainer(activeTab === 'profile', darkMode)}>
+              {/* Render User initial capital node tag letter dynamically */}
+              {user?.firstName?.charAt(0).toUpperCase() || 'D'}
             </div>
-            <div>
-              <div className={styles.profileName(darkMode)}>Developer Profile</div>
-              <div className="text-[10px] text-indigo-500 font-medium tracking-wider font-mono">
-                SYSTEM INTERN
+            <div className="truncate">
+              <div className={styles.profileName(darkMode)}>{user?.firstName || 'Developer'}</div>
+              <div className="text-[10px] text-indigo-500 font-bold tracking-wider font-mono uppercase">
+                Active Operator
               </div>
             </div>
           </div>
