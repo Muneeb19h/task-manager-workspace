@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import Task
@@ -11,6 +12,7 @@ class TaskBaseAPIView(APIView):
     #registring serializer class globally
     serializer_class=TaskSerializer
 
+    permission_classes = [IsAuthenticated]
     #Feeding metadata to Borwser UI for form Design
     def get_serializer(self,*args,**kwargs):
         return self.serializer_class(*args,**kwargs)
@@ -21,7 +23,7 @@ class TaskListCreateAPIView(TaskBaseAPIView):
     
     #List all tasks
     def get(self,request):
-        tasks=Task.objects.all().order_by('-created_at') 
+        tasks=Task.objects.filter(user=request.user).order_by('-created_at') 
         serializer=self.get_serializer(tasks,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     
@@ -30,7 +32,7 @@ class TaskListCreateAPIView(TaskBaseAPIView):
         #converting comming data(from form) into serializers
         serializer=self.get_serializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
@@ -43,8 +45,8 @@ class TaskListCreateAPIView(TaskBaseAPIView):
 class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
 
     #replacing repeatation with one get_obj func(for 404)
-    def get_object(self,pk):
-        return get_object_or_404(Task,pk=pk)
+    def get_object(self,pk,user):
+        return get_object_or_404(Task,pk=pk,user=user)
     
     #reterive single task
     def get(self,request,pk):
