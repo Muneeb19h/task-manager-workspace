@@ -1,7 +1,9 @@
-import { FaTrash, FaSyncAlt, FaEdit, FaSearchMinus, FaTimes } from 'react-icons/fa';
+// AllTasksView.tsx
 import React, { useState } from 'react';
+import { FaTrash, FaSyncAlt, FaEdit, FaSearchMinus, FaTimes, FaSearch } from 'react-icons/fa';
 import type { AllTasksProps, Task } from '../types/task.types';
 import { CustomStatusSelect } from './CustomStatusSelect';
+import { styles } from '../styles/AllTaskView.styles';
 
 export const AllTasksView: React.FC<AllTasksProps> = ({
   darkMode,
@@ -13,13 +15,18 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
   onUpdateStatus,
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Filter tasks dynamically using state parameter bounds
-  const filteredTasks = tasks.filter(
-    (task) => statusFilter === 'All' || task.status === statusFilter
-  );
+  const filteredTasks = tasks.filter((task) => {
+    const matchesStatus = statusFilter === 'All' || task.status === statusFilter;
+    const normalizedQuery = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      task.title.toLowerCase().includes(normalizedQuery) ||
+      (task.description && task.description.toLowerCase().includes(normalizedQuery));
 
-  // Find live task information to keep details view synced post-mutation
+    return matchesStatus && matchesSearch;
+  });
+
   const activeTaskDetails = tasks.find((t) => t.id === selectedTask?.id) || selectedTask;
 
   const handleStatusCycle = async (task: Task) => {
@@ -36,23 +43,42 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
   const handleDeleteTrigger = async (id: string) => {
     const success = await onDeleteTask(id);
     if (success) {
-      setSelectedTask(null); // Safely drop state panel view node to avoid ghost data streams
+      setSelectedTask(null);
     }
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className={styles.container}>
       {/* Dynamic Selector Header */}
-      <div
-        className={`p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${
-          darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'
-        }`}
-      >
-        <div>
-          <h2 className="text-lg font-black tracking-tight">System Records Ledger</h2>
-          <p className="text-xs text-slate-400">
+      <div className={styles.headerCard(darkMode)}>
+        <div className={styles.headerTextWrapper}>
+          <h2 className={styles.headerTitle}>System Records Ledger</h2>
+          <p className={styles.headerSubtitle}>
             Reviewing all data matching active scope filter indices.
           </p>
+        </div>
+
+        {/* Search Bar Input */}
+        <div className={styles.searchContainer}>
+          <div className={styles.searchIconContainer}>
+            <FaSearch className={styles.searchIcon(darkMode)} />
+          </div>
+          <input
+            type="text"
+            placeholder="Search task title or description..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={styles.searchInput(darkMode)}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className={styles.searchClearBtn}
+              title="Clear Search"
+            >
+              <FaTimes className={styles.searchClearIcon} />
+            </button>
+          )}
         </div>
 
         <CustomStatusSelect
@@ -62,88 +88,68 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
         />
       </div>
 
-      {/* Main Structural Layout Split-Screen */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      {/* Main Layout Split-Screen */}
+      <div className={styles.mainGrid}>
         {/* Left Side Table: Task List */}
-        <div
-          className={`lg:col-span-2 rounded-2xl border overflow-hidden ${
-            darkMode ? 'bg-slate-900/40 border-slate-800/60' : 'bg-white border-slate-200'
-          }`}
-        >
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead
-                className={`text-xs font-black uppercase tracking-wider border-b ${
-                  darkMode
-                    ? 'bg-slate-950/60 border-slate-800 text-slate-400'
-                    : 'bg-slate-50 border-slate-200 text-slate-500'
-                }`}
-              >
+        <div className={styles.tableContainer(darkMode)}>
+          <div className={styles.tableWrapper}>
+            <table className={styles.tableElement}>
+              <thead className={styles.tableHeader(darkMode)}>
                 <tr>
-                  <th className="p-4">Task Details</th>
-                  <th className="p-4">Due Date</th>
-                  <th className="p-4 text-right">Actions</th>
+                  <th className={styles.tableHeaderCell}>Task Details</th>
+                  <th className={styles.tableHeaderCell}>Due Date</th>
+                  <th className={styles.tableHeaderCell} style={{ textAlign: 'right' }}>
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/10">
-                {filteredTasks.map((task) => (
-                  <tr
-                    key={task.id}
-                    onClick={() => setSelectedTask(task)}
-                    className={`cursor-pointer transition-colors ${
-                      activeTaskDetails?.id === task.id
-                        ? darkMode
-                          ? 'bg-indigo-600/10'
-                          : 'bg-indigo-50'
-                        : darkMode
-                          ? 'hover:bg-slate-800/20'
-                          : 'hover:bg-slate-50'
-                    }`}
-                  >
-                    <td className="p-4">
-                      <div className="font-bold tracking-tight">{task.title}</div>
-                      <div className="text-xs text-slate-400 font-mono mt-0.5">{task.status}</div>
-                    </td>
-                    <td className="p-4 font-mono text-xs">{task.dueDate}</td>
-                    <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => onEditSelect(task)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow transition-colors"
+                {filteredTasks.length > 0 ? (
+                  filteredTasks.map((task) => {
+                    const isActive = activeTaskDetails?.id === task.id;
+                    return (
+                      <tr
+                        key={task.id}
+                        onClick={() => setSelectedTask(task)}
+                        className={styles.tableRow(isActive, darkMode)}
                       >
-                        <FaEdit className="text-xs" /> Edit
-                      </button>
+                        <td className={styles.tableBodyCell}>
+                          <div className={styles.taskTitle}>{task.title}</div>
+                          <div className={styles.taskMetaStatus}>{task.status}</div>
+                        </td>
+                        <td className={styles.taskDueDate}>{task.dueDate}</td>
+                        <td className={styles.actionsCell} onClick={(e) => e.stopPropagation()}>
+                          <button onClick={() => onEditSelect(task)} className={styles.editBtn}>
+                            <FaEdit className="text-xs" /> Edit
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={3} className={styles.tableEmptyRow}>
+                      No system task records found matching current query boundaries.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
         {/* Right Side Column: Task Details Panel */}
-        <div
-          className={`p-6 rounded-2xl border transition-all ${
-            selectedTask
-              ? darkMode
-                ? 'bg-slate-900/60 border-slate-800 shadow-2xl'
-                : 'bg-white border-slate-200 shadow-xl'
-              : 'opacity-50 border-dashed border-slate-700/40 text-center py-12'
-          }`}
-        >
+        <div className={styles.detailsPanel(!!selectedTask, darkMode)}>
           {selectedTask && activeTaskDetails ? (
             <div className="space-y-4">
-              <div className="flex justify-between items-start border-b border-slate-800/10 pb-3">
+              <div className={styles.detailsHeader}>
                 <div>
-                  <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-500 uppercase">
-                    Selected Identity Node
-                  </span>
-                  <h3 className="text-base font-black tracking-tight mt-1">
-                    {activeTaskDetails.title}
-                  </h3>
+                  <span className={styles.detailsSubHeading}>Selected Identity Node</span>
+                  <h3 className={styles.detailsTitle}>{activeTaskDetails.title}</h3>
                 </div>
                 <button
                   onClick={() => setSelectedTask(null)}
-                  className="flex items-center justify-center p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800/50 transition-colors"
+                  className={styles.detailsCloseBtn}
                   title="Close Details"
                 >
                   <FaTimes className="text-xs" />
@@ -151,62 +157,45 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
               </div>
 
               <div>
-                <h4
-                  className={`text-[10px] font-black uppercase tracking-wider mb-2 font-mono ${
-                    darkMode ? 'text-slate-500' : 'text-slate-400'
-                  }`}
-                >
-                  Functional Blueprint Scope
-                </h4>
-                <p
-                  className={`text-xs leading-relaxed p-4 rounded-xl border transition-colors duration-200 ${
-                    darkMode
-                      ? 'text-slate-300 bg-slate-950/40 border-slate-800/60'
-                      : 'text-slate-600 bg-slate-100/70 border-slate-200/80'
-                  }`}
-                >
+                <h4 className={styles.sectionLabel(darkMode)}>Functional Blueprint Scope</h4>
+                <p className={styles.descriptionBox(darkMode)}>
                   {activeTaskDetails.description ||
                     'No metadata description constraints attached to this system entry.'}
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 text-xs pt-2">
+              <div className={styles.metadataGrid}>
                 <div>
-                  <span className="block text-[10px] text-slate-400 font-bold uppercase">
-                    Status State
-                  </span>
+                  <span className={styles.metaLabel}>Status State</span>
                   <button
                     onClick={() => handleStatusCycle(activeTaskDetails)}
-                    className="flex items-center gap-1.5 font-medium mt-1 inline-block text-indigo-400 hover:underline text-left cursor-pointer"
+                    className={styles.statusCycleLink}
                   >
                     {activeTaskDetails.status}{' '}
-                    <FaSyncAlt className="text-[10px] animate-spin-hover" />
+                    <FaSyncAlt className="text-[10px] anarchist-spin-hover" />
                   </button>
                 </div>
                 <div>
-                  <span className="block text-[10px] text-slate-400 font-bold uppercase">
-                    Deadline target
-                  </span>
-                  <span className="font-mono mt-1 inline-block">{activeTaskDetails.dueDate}</span>
+                  <span className={styles.metaLabel}>Deadline target</span>
+                  <span className={styles.dueDateText}>{activeTaskDetails.dueDate}</span>
                 </div>
               </div>
 
-              {/* Functional Dynamic Inline Actions Wrapper Footer */}
-              <div className="pt-4 border-t border-slate-800/10 flex justify-end">
+              <div className={styles.detailsFooter}>
                 <button
                   onClick={() => handleDeleteTrigger(activeTaskDetails.id)}
-                  className="flex items-center justify-center gap-2 px-3 py-1.5 bg-rose-950/40 border border-rose-900/40 text-rose-400 text-xs font-bold rounded-lg hover:bg-rose-900/40 transition-colors w-full sm:w-auto"
+                  className={styles.deleteBtn}
                 >
                   <FaTrash className="text-xs" /> Delete Task Entry
                 </button>
               </div>
             </div>
           ) : (
-            <div className="text-slate-500 text-xs font-medium">
-              <div className="flex items-center gap-2">
-                <FaSearchMinus className="text-sm opacity-70" /> Task Details Stream Offline
+            <div className={styles.offlineWrapper}>
+              <div className={styles.offlineHeader}>
+                <FaSearchMinus className={styles.offlineIcon} /> Task Details Stream Offline
               </div>
-              <p className="mt-1 text-[11px] text-slate-400/60 font-normal">
+              <p className={styles.offlineText}>
                 Select any task row tracking entity node on the left list to initialize details view
                 telemetry.
               </p>
