@@ -1,13 +1,16 @@
+// src/components/Dashboard/DashboardContainer.tsx
 import React from 'react';
 import { DashboardHeader } from './DashboardHeader';
 import { StatsGrid } from './StatsGrid';
 import { TaskBoardView } from './TaskBoardView';
+import { TaskProgressWidget } from './TaskProgressWidget';
 import type { Task, FilterStatus } from '../../types/task.types';
+import type { TabId } from '../../../../types/navigation.types';
 
 interface DashboardContainerProps {
   darkMode: boolean;
   tasks: Task[];
-  setActiveTab: (tab: 'dashboard' | 'all-tasks' | 'add-task') => void;
+  setActiveTab: (tab: TabId) => void;
   setStatusFilter: (filter: FilterStatus) => void;
   onEditSelect: (task: Task) => void;
   taskCount: {
@@ -28,12 +31,15 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
 }) => {
   return (
     <div className="w-full space-y-8 animate-fadeIn">
-      {/* s1st Layer: Header expands across the absolute top */}
+      {/* 1st Layer: Header expands across the absolute top */}
       <DashboardHeader
         darkMode={darkMode}
         totalTasks={taskCount.total}
         pendingTasks={taskCount.pending}
       />
+
+      {/* Progress Telemetry Row Layer: Inserted cleanly to track actual completion rates */}
+      <TaskProgressWidget darkMode={darkMode} tasks={tasks} />
 
       {/* 2nd Layer: Numeric analytics counters */}
       <StatsGrid
