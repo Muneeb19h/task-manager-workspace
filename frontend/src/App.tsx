@@ -71,7 +71,9 @@ const MainAppContent = () => {
         setStatusFilter={setStatusFilter}
       />
 
-      <main className="flex-1 p-4 md:p-6 lg:p-8 w-full max-w-7xl mx-auto overflow-x-hidden space-y-6">
+      <main
+        className={`flex-1 p-4 md:p-6 lg:p-8 lg:ml-64 w-full overflow-x-hidden ${activeTab === 'add-task' ? 'flex flex-col items-center justify-center min-h-screen' : 'space-y-6'}`}
+      >
         {/* Network Error Banner Notification */}
         {error && (
           <div className="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold rounded-xl">

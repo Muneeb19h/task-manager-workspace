@@ -65,7 +65,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
         }`}
       >
         <div className="mb-6">
-          <h2 className="text-xl font-black tracking-tight">System Access Portal</h2>
+          <h2 className="text-xl font-black tracking-tight">Login</h2>
           <p className="text-xs text-slate-400 mt-1">Authenticate identity node credentials.</p>
         </div>
 
@@ -118,7 +118,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
           disabled={loading}
           className="w-full mt-6 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/20 active:scale-[0.98]"
         >
-          {loading ? 'Authenticating Gateway...' : 'Initialize Access Session'}
+          {loading ? 'Authenticating Gateway...' : 'Login'}
         </button>
 
         {/* 🌟 Navigation Toggle Trigger to swap over to your new creation component */}
@@ -126,7 +126,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
           onClick={onSwitchToRegister}
           className="text-center text-[11px] text-indigo-400 hover:underline mt-4 cursor-pointer font-medium tracking-wide transition-all"
         >
-          New node operator? Register Profile Here
+          Don't have an Account? Register Here
         </p>
       </form>
     </div>

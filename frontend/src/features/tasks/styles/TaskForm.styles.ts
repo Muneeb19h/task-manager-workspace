@@ -1,6 +1,6 @@
 export const taskFormStyles = {
   card: (dark: boolean) =>
-    `border rounded-2xl p-6 shadow-2xl transition-all duration-300 ${
+    `border rounded-2xl p-6 shadow-2xl transition-all duration-300 lg:max-w-2xl w-full ${
       dark ? 'bg-slate-900/40 border-slate-800/60' : 'bg-white border-slate-200'
     }`,
   heading: (dark: boolean) =>

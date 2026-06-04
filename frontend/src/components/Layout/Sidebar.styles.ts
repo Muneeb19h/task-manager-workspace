@@ -1,11 +1,11 @@
 export const sidebarStyles = {
   container: (dark: boolean, isOpen: boolean) =>
-    `fixed inset-y-0 left-0 z-50 w-64 p-6 flex flex-col justify-between shrink-0 transition-transform duration-300 transform 
+    `fixed inset-y-0 left-0 z-50 w-64 p-6 flex flex-col justify-between shrink-0 transition-transform duration-300 transform h-screen overflow-y-auto
     ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-    lg:relative lg:translate-x-0 lg:w-64 lg:min-h-screen border-r ${
+    lg:fixed lg:inset-y-0 lg:left-0 lg:translate-x-0 lg:z-30 lg:w-64 lg:h-screen lg:overflow-y-auto border-r ${
       dark
-        ? 'bg-slate-900/95 lg:bg-slate-900/60 backdrop-blur-xl border-slate-800/80'
-        : 'bg-white lg:bg-slate-100 backdrop-blur-xl border-slate-200'
+        ? 'bg-slate-900/95 backdrop-blur-xl border-slate-800/80'
+        : 'bg-white backdrop-blur-xl border-slate-200'
     }`,
 
   brandText: (dark: boolean) =>

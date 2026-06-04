@@ -41,7 +41,7 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
         className={`w-full max-w-sm p-8 rounded-2xl border shadow-2xl ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
       >
         <div className="mb-6">
-          <h2 className="text-xl font-black tracking-tight">Initialize Profile Node</h2>
+          <h2 className="text-xl font-black tracking-tight">Sign up</h2>
           <p className="text-xs text-slate-400 mt-1">Register your pipeline node credentials.</p>
         </div>
 
@@ -99,14 +99,14 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
           type="submit"
           className="w-full mt-6 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg"
         >
-          Create System Account
+          Sign up
         </button>
 
         <p
           onClick={onSwitchToLogin}
           className="text-center text-[11px] text-indigo-400 hover:underline mt-4 cursor-pointer"
         >
-          Already have a profile node? Log In
+          Already have a profile ? Log In
         </p>
       </form>
     </div>

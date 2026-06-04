@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { SidebarProps } from './types/sidebar.types';
 import type { TabId } from '../../types/navigation.types';
 import { sidebarStyles as styles } from './Sidebar.styles';
-import { useAuth } from '../../features/auth/context/AuthContext'; // 🌟 Import your authentication core context hook
+import { useAuth } from '../../features/auth/context/AuthContext';
 import {
   FaThLarge,
   FaListUl,
@@ -175,8 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
 
-          {/* 🌟 Upgraded Interactive Bottom Identity Card Component */}
-          {/* Note: In your routing types, ensure 'profile' is added to TabId string types! */}
+          {/* Upgraded Interactive Bottom Identity Card Component */}
           <div
             onClick={() => handleNavClick('profile' as TabId)}
             className={styles.profileContainer(activeTab === 'profile', darkMode)}
