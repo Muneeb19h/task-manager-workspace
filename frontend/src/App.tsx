@@ -4,23 +4,23 @@ import AllTasksView from './features/tasks/components/AllTasksView';
 import TaskForm from './features/tasks/components/TaskForm';
 import DashboardContainer from './features/tasks/components/Dashboard/DashboardContainer';
 import type { Task, FilterStatus } from './features/tasks/types/task.types';
-import type { TabId } from './types/navigation.types'; // 🌟 Importing your updated TabId definition
+import type { TabId } from './types/navigation.types';
 
 // Authentication Layer Imports
 import { AuthProvider, useAuth } from './features/auth/context/AuthContext';
 import { LoginView } from './features/auth/components/LoginView';
-import { RegisterView } from './features/auth/components/RegisterView'; // 🌟 Import registration gate component
+import { RegisterView } from './features/auth/components/RegisterView';
 
 // Task Data Pipeline Hook
 import { useTaskOperations } from './features/tasks/hooks/useTaskOperations';
 
 const MainAppContent = () => {
-  // 🌟 Extract user information and logout controls directly from your updated context layer
+  // Extract user information and logout controls directly from your context layer
   const { isAuthenticated, user, logout } = useAuth();
 
-  // 🌟 Updated Tab state constraint to match your separate navigation type definition safely
+  // Navigation and layout view state parameters
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
-  const [isRegistering, setIsRegistering] = useState<boolean>(false); // 🌟 Tracks auth page state switcher
+  const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('All');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -40,6 +40,18 @@ const MainAppContent = () => {
     setActiveTab('add-task');
   };
 
+  //FIX: Typed Wrapper handler to bridge the hook's object response with the boolean signature expected by the child views
+  const handleUpdateTaskStatus = async (id: string, payload: Partial<Task>): Promise<boolean> => {
+    try {
+      const response = await updateTask(id, payload);
+      // Explicitly pull out and return just the boolean success flag to appease the compiler
+      return response.success;
+    } catch (err) {
+      console.error('Pipeline Sync Error:', err);
+      return false;
+    }
+  };
+
   const taskCount = {
     total: tasks.length,
     pending: tasks.filter((t) => t.status === 'Pending').length,
@@ -47,7 +59,7 @@ const MainAppContent = () => {
     completed: tasks.filter((t) => t.status === 'Completed').length,
   };
 
-  // 🌟 GUARD LAYER: Renders either the Login portal or the Register form based on switcher state
+  // GUARD LAYER: Renders either the Login portal or the Register form based on switcher state
   if (!isAuthenticated) {
     if (isRegistering) {
       return <RegisterView darkMode={darkMode} onSwitchToLogin={() => setIsRegistering(false)} />;
@@ -72,7 +84,11 @@ const MainAppContent = () => {
       />
 
       <main
-        className={`flex-1 p-4 md:p-6 lg:p-8 lg:ml-64 w-full overflow-x-hidden ${activeTab === 'add-task' ? 'flex flex-col items-center justify-center min-h-screen' : 'space-y-6'}`}
+        className={`flex-1 p-4 md:p-6 lg:p-8 lg:ml-64 w-full overflow-x-hidden ${
+          activeTab === 'add-task'
+            ? 'flex flex-col items-center justify-center min-h-screen'
+            : 'space-y-6'
+        }`}
       >
         {/* Network Error Banner Notification */}
         {error && (
@@ -108,7 +124,7 @@ const MainAppContent = () => {
             setStatusFilter={setStatusFilter}
             onEditSelect={handleEditSelect}
             onDeleteTask={deleteTask}
-            onUpdateStatus={updateTask}
+            onUpdateStatus={handleUpdateTaskStatus} // Added our verified wrapper handler here!
           />
         )}
 
@@ -124,7 +140,7 @@ const MainAppContent = () => {
           />
         )}
 
-        {/* 🌟 NEW CANVAS VIEW ROUTE: Profile Parameter Management Screen Container */}
+        {/* PROFILE PARAMETER MANAGEMENT CANVAS */}
         {activeTab === 'profile' && (
           <div
             className={`p-8 rounded-2xl border transition-all duration-200 ${
@@ -136,7 +152,9 @@ const MainAppContent = () => {
 
             <div className="mt-6 space-y-4 max-w-md">
               <div
-                className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-50 border-slate-200'}`}
+                className={`p-4 rounded-xl border ${
+                  darkMode ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-50 border-slate-200'
+                }`}
               >
                 <span className="text-[10px] font-bold tracking-wider uppercase text-slate-400 block mb-1">
                   Node Operator Alias
@@ -149,7 +167,9 @@ const MainAppContent = () => {
               </div>
 
               <div
-                className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-50 border-slate-200'}`}
+                className={`p-4 rounded-xl border ${
+                  darkMode ? 'bg-slate-950/40 border-slate-800/60' : 'bg-slate-50 border-slate-200'
+                }`}
               >
                 <span className="text-[10px] font-bold tracking-wider uppercase text-slate-400 block mb-1">
                   System Login Username
