@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'; // 🌟 Added useCallback
+import { useState, useCallback } from 'react';
 import { taskClient } from '../api/taskClient';
 import type { Task, TaskStatus } from '../types/task.types';
 import axios from 'axios';
@@ -50,7 +50,7 @@ export const useTaskOperations = () => {
   const [error, setError] = useState<string | null>(null);
 
   // 1. GET ALL (TaskListCreateAPIView - GET)
-  // 🌟 Memoized using useCallback with an empty dependency array
+  // Memoized using useCallback with an empty dependency array
   const fetchTasks = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -67,7 +67,7 @@ export const useTaskOperations = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [logout]); // 🌟 Reference stays completely stable across app cycles
+  }, [logout]); // Reference stays completely stable across app cycles
 
   // 2. CREATE NEW (TaskListCreateAPIView - POST)
   const createTask = useCallback(

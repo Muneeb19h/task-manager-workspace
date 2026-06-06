@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
-// 🌟 Added props to allow navigating back and forth with your new Registration card
+// Added props to allow navigating back and forth with your new Registration card
 interface LoginViewProps {
   darkMode: boolean;
   onSwitchToRegister: () => void;
@@ -121,7 +121,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
           {loading ? 'Authenticating Gateway...' : 'Login'}
         </button>
 
-        {/* 🌟 Navigation Toggle Trigger to swap over to your new creation component */}
+        {/* Navigation Toggle Trigger to swap over to your new creation component */}
         <p
           onClick={onSwitchToRegister}
           className="text-center text-[11px] text-indigo-400 hover:underline mt-4 cursor-pointer font-medium tracking-wide transition-all"

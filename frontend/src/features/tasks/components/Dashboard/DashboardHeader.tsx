@@ -1,6 +1,5 @@
 import React from 'react';
 import { FaTerminal, FaCalendarAlt } from 'react-icons/fa';
-// 🌟 Corrected typo import to pull useAuth cleanly
 import { useAuth } from '../../../auth/context/AuthContext';
 
 interface DashboardHeaderProps {
@@ -14,7 +13,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   totalTasks,
   pendingTasks,
 }) => {
-  // 🌟 Extract the active user state context parameters
+  // Extract the active user state context parameters
   const { user } = useAuth();
 
   // Evaluated instantly as a constant value so the linter tracks it flawlessly
@@ -46,7 +45,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <h1
           className={`text-2xl md:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}
         >
-          {greeting}, {/* 🌟 Dynamic context name display with automatic fallback */}
+          {greeting}, {/*Dynamic context name display with automatic fallback */}
           <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent capitalize">
             {user?.username
               ? user.username.charAt(0).toUpperCase() + user.username.slice(1)

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// 🌟 1. Update the User interface signature
+// 1. Update the User interface signature
 interface UserProfile {
   username: string;
 }
@@ -18,7 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('access_token'));
 
-  // 🌟 2. Initialize user state from localStorage so it persists on tab refresh
+  // 2. Initialize user state from localStorage so it persists on tab refresh
   const [user, setUser] = useState<UserProfile | null>(() => {
     const savedUsername = localStorage.getItem('user_username');
 
@@ -28,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return null;
   });
 
-  // 🌟 3. Update login to write both tokens and user data into memory
+  // 3. Update login to write both tokens and user data into memory
   const login = (accessToken: string, refreshToken: string, username: string) => {
     localStorage.setItem('access_token', accessToken);
     localStorage.setItem('refresh_token', refreshToken);
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser({ username });
   };
 
-  // 🌟 4. Clean out everything upon termination of the session
+  // 4. Clean out everything upon termination of the session
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');

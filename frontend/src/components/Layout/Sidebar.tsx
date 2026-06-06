@@ -28,7 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   setStatusFilter,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth(); // 🌟 Extract user session data
+  const { user } = useAuth(); // Extract user session data
 
   const menuItems: MenuItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <FaThLarge /> },

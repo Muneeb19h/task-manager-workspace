@@ -28,7 +28,7 @@ export const sidebarStyles = {
   themeWidgetText: (dark: boolean) =>
     `text-xs font-bold tracking-wide flex items-center gap-2 ${dark ? 'text-slate-400' : 'text-slate-600'}`,
 
-  // 🌟 Upgraded Profile container style wrapper with responsive focus background mapping
+  // Upgraded Profile container style wrapper with responsive focus background mapping
   profileContainer: (isSelected: boolean, dark: boolean) =>
     `pt-4 border-t flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 ${
       dark ? 'border-slate-800/60' : 'border-slate-200'
@@ -40,7 +40,7 @@ export const sidebarStyles = {
           : 'border border-transparent hover:bg-slate-200/40'
     }`,
 
-  // 🌟 Swapped standard user icon out for customized initials letter block avatar styles
+  // Swapped standard user icon out for customized initials letter block avatar styles
   profileIconContainer: (isSelected: boolean, dark: boolean) =>
     `h-9 w-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
       isSelected
