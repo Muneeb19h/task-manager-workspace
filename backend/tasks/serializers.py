@@ -2,12 +2,21 @@
 # and converts them into clean JSON data that frontend can easily read and interact with later#
 from rest_framework import serializers
 from django.utils import timezone
+from django.contrib.auth.models import User
 from .models import Task
 
+
+class UserSharedSummarySerializer(serializers.ModelSerializer):
+    """light weight summary nested serializer for user references"""
+    class Meta:
+        model=User
+        fields=['id','username','email']
 class TaskSerializer(serializers.ModelSerializer):
+    owner_details=UserSharedSummarySerializer(source='user',read_only=True)
+    shared_with_details=UserSharedSummarySerializer(source='shared_with',many=True,read_only=True)
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = ['id','user','owner_details','title','description','status','due_date','shared_with','shared_with_details','created_at','updated_at']
         extra_kwargs = {
             'user': {'read_only': True},
         }
