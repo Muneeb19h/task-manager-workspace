@@ -2,16 +2,16 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
-from channels.layers import get_channel_layer  # 🌟 Added: For reaching WebSocket lines
-from asgiref.sync import async_to_sync        # 🌟 Added: Converts async tasks to run in sync view
+from channels.layers import get_channel_layer  # For reaching WebSocket lines
+from asgiref.sync import async_to_sync        # Converts async tasks to run in sync view
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import TaskSerializer
+from .serializers import TaskSerializer, NotificationSerializer
 from rest_framework import status
-from .models import Task
+from .models import Task, Notification
 
 
 # Parent (Base class Holds common Form/metadata logic)
@@ -90,9 +90,18 @@ class TaskShareActionAPIView(TaskBaseAPIView):
         task.shared_with.set(valid_users)
         task.save()
         
-        # 🌟 REAL-TIME TRIGGER 1: Notify users that a task was shared with them
+        # 🌟 UPDATED: Save to Database AND Send Real-Time Share Notification
         channel_layer = get_channel_layer()
         for member in valid_users:
+            # 1. Persistent Database Record
+            Notification.objects.create(
+                recipient=member,
+                notification_type="TASK_SHARED",
+                task_title=task.title,
+                message=f"Great news! {request.user.username} shared the task '{task.title}' with you."
+            )
+            
+            # 2. Live WebSocket Push
             async_to_sync(channel_layer.group_send)(
                 f"user_notification_{member.id}",  # Target the receiver's private line
                 {
@@ -136,7 +145,7 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
     # update task
     def put(self, request, pk):
         task = self.get_object(pk)
-        old_status = task.status  # 🌟 Track status changes for complete replacement updates
+        old_status = task.status  # Track status changes for complete replacement updates
         
         serializer = self.get_serializer(task, data=request.data)
         if serializer.is_valid():
@@ -151,7 +160,7 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
     # partial update task state modification
     def patch(self, request, pk):
         task = self.get_object(pk)
-        old_status = task.status  # 🌟 Track status changes for partial state updates
+        old_status = task.status  # Track status changes for partial state updates
         
         serializer = self.get_serializer(task, data=request.data, partial=True)
         if serializer.is_valid():
@@ -163,7 +172,7 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    # 🌟 HELPER METHOD: Broadcasts status changes to all relevant collaborators
+    # 🌟 UPDATED HELPER METHOD: Log to Database AND Broadcast status updates to all relevant users
     def _handle_status_notification(self, request, task, old_status):
         if old_status != task.status:
             channel_layer = get_channel_layer()
@@ -177,6 +186,17 @@ class TaskRetrieveUpdateDestroyAPIView(TaskBaseAPIView):
                 recipients.remove(request.user.id)
                 
             for user_id in recipients:
+                target_user = User.objects.get(id=user_id)
+                
+                # 1. Persistent Database Record
+                Notification.objects.create(
+                    recipient=target_user,
+                    notification_type="STATUS_UPDATED",
+                    task_title=task.title,
+                    message=f"Status Update: '{task.title}' has been moved from '{old_status}' to '{task.status}' by {request.user.username}."
+                )
+                
+                # 2. Live WebSocket Push
                 async_to_sync(channel_layer.group_send)(
                     f"user_notification_{user_id}",
                     {
@@ -228,3 +248,15 @@ class UserRegisterAPIView(APIView):
             }, 
             status=status.HTTP_201_CREATED
         )
+
+
+class NotificationListAPIView(TaskBaseAPIView):
+    """
+    Returns the persistent history logs of all notifications 
+    addressed directly to the requesting operator node.
+    """
+    def get(self, request):
+        # Fetch notifications for the currently logged-in user ordered by latest
+        notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

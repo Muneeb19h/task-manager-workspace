@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from django.utils import timezone
 from django.contrib.auth.models import User
-from .models import Task
+from .models import Task,Notification
 
 
 class UserSharedSummarySerializer(serializers.ModelSerializer):
@@ -20,7 +20,13 @@ class TaskSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'user': {'read_only': True},
         }
-
+        
+        
+        
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'notification_type', 'task_title', 'message', 'is_read', 'created_at']
         #Due date validations (No past dates)
     def validate_due_date(self,value):
         if self.instance:
