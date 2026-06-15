@@ -1,12 +1,12 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from channels.layers import get_channel_layer  # For reaching WebSocket lines
-from asgiref.sync import async_to_sync        # Converts async tasks to run in sync view
+from asgiref.sync import async_to_sync         # Converts async tasks to run in sync view
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Count          # Added Count here to fix aggregation queries
+from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import TaskSerializer, NotificationSerializer
@@ -268,6 +268,7 @@ class NotificationListAPIView(TaskBaseAPIView):
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class NotificationMarkReadAPIView(TaskBaseAPIView):
     """
     Marks all notifications belonging to the requesting user as read.
@@ -279,6 +280,7 @@ class NotificationMarkReadAPIView(TaskBaseAPIView):
             status=status.HTTP_200_OK
         )
 
+
 class UserListAPIView(TaskBaseAPIView):
     """
     Returns a clean registry of all active system users 
@@ -288,3 +290,58 @@ class UserListAPIView(TaskBaseAPIView):
         # Fetch all users except the person currently logged in
         users = User.objects.exclude(id=request.user.id).values('id', 'username')
         return Response(list(users), status=status.HTTP_200_OK)
+    
+    
+class TaskAnalyticsView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, format=None):
+        try:
+            # Scope data directly to the authenticated user requesting it
+            user_tasks = Task.objects.filter(user=request.user)
+            total_tasks = user_tasks.count()
+
+            # Aggregate status distributions safely
+            status_counts = user_tasks.values('status').annotate(count=Count('status'))
+            
+            # Map statuses to look exactly like the Recharts distribution schema expects
+            status_map = {item['status']: item['count'] for item in status_counts}
+            
+            completed = status_map.get('Completed', 0)
+            in_progress = status_map.get('In Progress', 0)
+            pending = status_map.get('Pending', 0)
+
+            # Handle Overdue calculations safely against timezone bounds
+            now = timezone.now()
+            overdue = user_tasks.filter(due_date__lt=now).exclude(status='Completed').count()
+
+            # Calculate Completion Rate safely to avoid DivisionByZero crashes
+            completion_rate = 0
+            if total_tasks > 0:
+                completion_rate = round((completed / total_tasks) * 100, 1)
+
+            payload = {
+                "summary": {
+                    "total_tasks": total_tasks,
+                    "completed": completed,
+                    "in_progress": in_progress,
+                    "pending": pending,
+                    "overdue": overdue,
+                    "overdue_count": overdue,  # Serves as a fallback for both naming variants
+                    "completion_rate": completion_rate
+                },
+                "status_distribution": [
+                    {"name": "Pending", "value": pending},
+                    {"name": "In Progress", "value": in_progress},
+                    {"name": "Completed", "value": completed}
+                ]
+            }
+
+            return Response(payload, status=200)
+
+        except Exception as e:
+
+            print(f"❌ Analytics Engine Breakdown Error: {str(e)}")
+            return Response(
+                {"error": "An internal system anomaly occurred while aggregating metrics."}, 
+                status=500
+            )

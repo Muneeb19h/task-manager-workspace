@@ -1,10 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import NotificationMarkReadAPIView, TaskListCreateAPIView,TaskRetrieveUpdateDestroyAPIView,TaskListSharedAPIView,TaskShareActionAPIView,NotificationListAPIView,UserListAPIView
+from .views import NotificationMarkReadAPIView, TaskAnalyticsView, TaskListCreateAPIView,TaskRetrieveUpdateDestroyAPIView,TaskListSharedAPIView,TaskShareActionAPIView,NotificationListAPIView,UserListAPIView
 
 
 urlpatterns=[
     path('users/', UserListAPIView.as_view(), name='user-list'),
+    path('analytics/', TaskAnalyticsView.as_view(), name='task-analytics'),
     path('tasks/', TaskListCreateAPIView.as_view(), name='task-list-create'),
     path('tasks/shared/', TaskListSharedAPIView.as_view(), name='task-list-shared'), # GET /api/tasks/shared/
     path('tasks/<int:pk>/', TaskRetrieveUpdateDestroyAPIView.as_view(), name='task-detail'),

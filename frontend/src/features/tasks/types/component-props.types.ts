@@ -1,5 +1,6 @@
 import type { Task, FilterStatus, TasksCount, TaskStatus } from './task.types';
 import type { TabId } from '../../../types/navigation.types';
+import type { ReactNode } from 'react';
 
 export interface NotificationItem {
   id: number;
@@ -61,4 +62,24 @@ export interface TaskBoardViewProps {
 export interface TaskProgressWidgetProps {
   darkMode: boolean;
   tasks: Task[];
+}
+
+export interface AnalyticsSummary {
+  overdue_count: ReactNode;
+  total_tasks: number;
+  completed: number;
+  in_progress: number;
+  pending: number;
+  overdue: number;
+  completion_rate: number;
+}
+
+export interface DataDistribution {
+  name: string;
+  value: number;
+}
+
+export interface AnalyticsPayload {
+  summary: AnalyticsSummary;
+  status_distribution: DataDistribution[];
 }
