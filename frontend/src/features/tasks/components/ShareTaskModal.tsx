@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaUserPlus, FaTimes, FaSpinner } from 'react-icons/fa';
-import type { Task } from '../types/task.types';
 import type {
   ShareTaskModalProps,
   SystemUser,

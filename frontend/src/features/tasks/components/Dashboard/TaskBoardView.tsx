@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Task, TaskStatus } from '../../types/task.types';
+import type { TaskStatus } from '../../types/task.types';
 import type { TaskBoardViewProps } from '../../types/component-props.types';
 import { FaCalendarAlt } from 'react-icons/fa';
 

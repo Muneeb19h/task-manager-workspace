@@ -1,6 +1,5 @@
 // src/components/Dashboard/TaskProgressWidget.tsx
 import React from 'react';
-import type { Task } from '../../types/task.types'; // Adjust this import path relative to your types file location
 import type { TaskProgressWidgetProps } from '../../types/component-props.types';
 import { styles } from '../../styles/TaskProgressWidget.styles';
 
