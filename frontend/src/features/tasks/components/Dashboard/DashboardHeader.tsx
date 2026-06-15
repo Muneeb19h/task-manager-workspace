@@ -3,12 +3,7 @@ import { FaTerminal, FaCalendarAlt } from 'react-icons/fa';
 import { useAuth } from '../../../auth/context/AuthContext';
 // Import the updated notification bell component safely
 import { NotificationBell } from '../NotificationBell';
-
-interface DashboardHeaderProps {
-  darkMode: boolean;
-  totalTasks: number;
-  pendingTasks: number;
-}
+import type { DashboardHeaderProps } from '../../types/component-props.types';
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   darkMode,

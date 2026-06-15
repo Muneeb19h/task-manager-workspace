@@ -1,26 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaUserPlus, FaTimes, FaSpinner } from 'react-icons/fa';
 import type { Task } from '../types/task.types';
+import type {
+  ShareTaskModalProps,
+  SystemUser,
+  ExtendedTaskPayload,
+} from '../types/component-props.types';
 // Import your verified api client
 import { taskClient } from '../api/taskClient';
-
-interface ShareTaskModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  task: Task;
-  onShareSuccess?: (updatedTask: Task) => void;
-}
-
-interface SystemUser {
-  id: number;
-  username: string;
-  name?: string;
-}
-
-interface ExtendedTaskPayload {
-  shared_with?: Array<{ id: number; username: string } | number>;
-  task?: Task;
-}
 
 export const ShareTaskModal: React.FC<ShareTaskModalProps> = ({
   isOpen,

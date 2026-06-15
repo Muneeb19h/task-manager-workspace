@@ -1,15 +1,9 @@
 import { useState, useCallback } from 'react';
 import { taskClient } from '../api/taskClient';
-import type { Task, TaskStatus } from '../types/task.types';
+import type { Task } from '../types/task.types';
+import type { CreateTaskPayload } from '../types/component-props.types';
 import axios from 'axios';
 import { useAuth } from '../../auth/context/AuthContext';
-
-interface CreateTaskPayload {
-  title: string;
-  description?: string;
-  status: TaskStatus;
-  dueDate: string;
-}
 
 const getApiErrorMessage = (error: unknown, defaultMessage: string) => {
   if (!axios.isAxiosError(error)) return defaultMessage;

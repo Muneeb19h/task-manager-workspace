@@ -1,18 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaBell, FaCircle } from 'react-icons/fa';
+import type { NotificationBellProps, NotificationItem } from '../types/component-props.types';
 // Import your central API client wrapper
 import { taskClient } from '../api/taskClient';
-
-interface NotificationItem {
-  id: number;
-  message: string;
-  is_read: boolean;
-  created_at: string;
-}
-
-interface NotificationBellProps {
-  darkMode: boolean;
-}
 
 export const NotificationBell: React.FC<NotificationBellProps> = ({ darkMode }) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);

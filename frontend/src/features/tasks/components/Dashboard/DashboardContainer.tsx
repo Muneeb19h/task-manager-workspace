@@ -4,22 +4,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { StatsGrid } from './StatsGrid';
 import { TaskBoardView } from './TaskBoardView';
 import { TaskProgressWidget } from './TaskProgressWidget';
-import type { Task, FilterStatus } from '../../types/task.types';
-import type { TabId } from '../../../../types/navigation.types';
-
-interface DashboardContainerProps {
-  darkMode: boolean;
-  tasks: Task[];
-  setActiveTab: (tab: TabId) => void;
-  setStatusFilter: (filter: FilterStatus) => void;
-  onEditSelect: (task: Task) => void;
-  taskCount: {
-    total: number;
-    pending: number;
-    inProgress: number;
-    completed: number;
-  };
-}
+import type { DashboardContainerProps } from '../../types/component-props.types';
 
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({
   darkMode,

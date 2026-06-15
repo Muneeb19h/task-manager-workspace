@@ -1,13 +1,7 @@
 import React from 'react';
 import type { Task, TaskStatus } from '../../types/task.types';
+import type { TaskBoardViewProps } from '../../types/component-props.types';
 import { FaCalendarAlt } from 'react-icons/fa';
-
-// Updated interface to receive the real tasks array and context controls
-interface TaskBoardViewProps {
-  darkMode: boolean;
-  tasks: Task[];
-  onEditSelect?: (task: Task) => void;
-}
 
 export const TaskBoardView: React.FC<TaskBoardViewProps> = ({ darkMode, tasks, onEditSelect }) => {
   // Styling maps to cleanly match your original layout design configurations dynamically
