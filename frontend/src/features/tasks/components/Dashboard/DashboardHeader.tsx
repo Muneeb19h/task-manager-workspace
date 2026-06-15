@@ -1,6 +1,8 @@
 import React from 'react';
 import { FaTerminal, FaCalendarAlt } from 'react-icons/fa';
 import { useAuth } from '../../../auth/context/AuthContext';
+// Import the updated notification bell component safely
+import { NotificationBell } from '../NotificationBell';
 
 interface DashboardHeaderProps {
   darkMode: boolean;
@@ -45,7 +47,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <h1
           className={`text-2xl md:text-3xl font-black tracking-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}
         >
-          {greeting}, {/*Dynamic context name display with automatic fallback */}
+          {greeting},{' '}
           <span className="bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent capitalize">
             {user?.username
               ? user.username.charAt(0).toUpperCase() + user.username.slice(1)
@@ -71,24 +73,31 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         </p>
       </div>
 
-      {/* Modern Status Badge / Calendar Box */}
-      <div
-        className={`flex items-center gap-3 px-4 py-3 rounded-xl border self-start md:self-auto ${
-          darkMode
-            ? 'bg-slate-900/60 border-slate-800 text-slate-300'
-            : 'bg-white border-slate-200/80 text-slate-600 shadow-sm'
-        }`}
-      >
-        <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xs border border-indigo-500/20">
-          <FaCalendarAlt />
-        </div>
-        <div className="text-left">
-          <div
-            className={`text-[10px] font-bold tracking-wider uppercase font-mono ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}
-          >
-            System Date
+      {/* Modern Status Badge / Notification Controls Group */}
+      <div className="flex items-center gap-3 self-start md:self-auto">
+        {/* Inject the live action polling bell container */}
+        <NotificationBell darkMode={darkMode} />
+
+        <div
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${
+            darkMode
+              ? 'bg-slate-900/60 border-slate-800 text-slate-300'
+              : 'bg-white border-slate-200/80 text-slate-600 shadow-sm'
+          }`}
+        >
+          <div className="h-8 w-8 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xs border border-indigo-500/20">
+            <FaCalendarAlt />
           </div>
-          <div className="text-xs font-black tracking-tight font-mono">{currentTime}</div>
+          <div className="text-left">
+            <div
+              className={`text-[10px] font-bold tracking-wider uppercase font-mono ${
+                darkMode ? 'text-slate-500' : 'text-slate-400'
+              }`}
+            >
+              System Date
+            </div>
+            <div className="text-xs font-black tracking-tight font-mono">{currentTime}</div>
+          </div>
         </div>
       </div>
     </div>

@@ -25,8 +25,16 @@ const MainAppContent = () => {
   const [statusFilter, setStatusFilter] = useState<FilterStatus>('All');
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
-  const { tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask } =
-    useTaskOperations();
+  const {
+    tasks,
+    isLoading,
+    error,
+    fetchTasks,
+    createTask,
+    updateTask,
+    deleteTask,
+    onShareTaskSync,
+  } = useTaskOperations();
 
   // Fetch database entries automatically only after successful authentication session
   useEffect(() => {
@@ -124,7 +132,8 @@ const MainAppContent = () => {
             setStatusFilter={setStatusFilter}
             onEditSelect={handleEditSelect}
             onDeleteTask={deleteTask}
-            onUpdateStatus={handleUpdateTaskStatus} // Added our verified wrapper handler here!
+            onUpdateStatus={handleUpdateTaskStatus}
+            onShareSuccess={onShareTaskSync}
           />
         )}
 

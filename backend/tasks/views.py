@@ -77,6 +77,13 @@ class TaskShareActionAPIView(TaskBaseAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
+        # Reject attempts to share with the owner/self via this endpoint
+        if request.user.id in user_ids:
+            return Response(
+                {"error": "Sharing error: owners cannot share a task with themselves."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         # Verify user IDs exist within the database
         valid_users = User.objects.filter(id__in=user_ids)
         
@@ -260,3 +267,24 @@ class NotificationListAPIView(TaskBaseAPIView):
         notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class NotificationMarkReadAPIView(TaskBaseAPIView):
+    """
+    Marks all notifications belonging to the requesting user as read.
+    """
+    def post(self, request):
+        Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+        return Response(
+            {"message": "All notifications marked read."},
+            status=status.HTTP_200_OK
+        )
+
+class UserListAPIView(TaskBaseAPIView):
+    """
+    Returns a clean registry of all active system users 
+    excluding the requesting operator node.
+    """
+    def get(self, request):
+        # Fetch all users except the person currently logged in
+        users = User.objects.exclude(id=request.user.id).values('id', 'username')
+        return Response(list(users), status=status.HTTP_200_OK)

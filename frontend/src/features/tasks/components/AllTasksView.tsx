@@ -1,8 +1,16 @@
-// AllTasksView.tsx
 import React, { useState } from 'react';
-import { FaTrash, FaSyncAlt, FaEdit, FaSearchMinus, FaTimes, FaSearch } from 'react-icons/fa';
+import {
+  FaTrash,
+  FaSyncAlt,
+  FaEdit,
+  FaSearchMinus,
+  FaTimes,
+  FaSearch,
+  FaUserPlus,
+} from 'react-icons/fa';
 import type { AllTasksProps, Task } from '../types/task.types';
 import { CustomStatusSelect } from './CustomStatusSelect';
+import { ShareTaskModal } from './ShareTaskModal';
 import { styles } from '../styles/AllTaskView.styles';
 
 export const AllTasksView: React.FC<AllTasksProps> = ({
@@ -16,6 +24,7 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sharingTask, setSharingTask] = useState<Task | null>(null);
 
   const filteredTasks = tasks.filter((task) => {
     const matchesStatus = statusFilter === 'All' || task.status === statusFilter;
@@ -44,6 +53,13 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
     const success = await onDeleteTask(id);
     if (success) {
       setSelectedTask(null);
+    }
+  };
+
+  // Explicit type definition here completely resolves the 'unexpected any' & 'unknown' parameters error
+  const handleShareSuccess = (updatedTask: Task): void => {
+    if (selectedTask?.id === updatedTask.id) {
+      setSelectedTask(updatedTask);
     }
   };
 
@@ -141,50 +157,61 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
         {/* Right Side Column: Task Details Panel */}
         <div className={styles.detailsPanel(!!selectedTask, darkMode)}>
           {selectedTask && activeTaskDetails ? (
-            <div className="space-y-4">
-              <div className={styles.detailsHeader}>
-                <div>
-                  <span className={styles.detailsSubHeading}>Selected Identity Node</span>
-                  <h3 className={styles.detailsTitle}>{activeTaskDetails.title}</h3>
-                </div>
-                <button
-                  onClick={() => setSelectedTask(null)}
-                  className={styles.detailsCloseBtn}
-                  title="Close Details"
-                >
-                  <FaTimes className="text-xs" />
-                </button>
-              </div>
-
-              <div>
-                <h4 className={styles.sectionLabel(darkMode)}>Functional Blueprint Scope</h4>
-                <p className={styles.descriptionBox(darkMode)}>
-                  {activeTaskDetails.description ||
-                    'No metadata description constraints attached to this system entry.'}
-                </p>
-              </div>
-
-              <div className={styles.metadataGrid}>
-                <div>
-                  <span className={styles.metaLabel}>Status State</span>
+            <div className="space-y-4 flex flex-col h-full justify-between">
+              <div className="space-y-4">
+                <div className={styles.detailsHeader}>
+                  <div>
+                    <span className={styles.detailsSubHeading}>Selected Identity Node</span>
+                    <h3 className={styles.detailsTitle}>{activeTaskDetails.title}</h3>
+                  </div>
                   <button
-                    onClick={() => handleStatusCycle(activeTaskDetails)}
-                    className={styles.statusCycleLink}
+                    onClick={() => setSelectedTask(null)}
+                    className={styles.detailsCloseBtn}
+                    title="Close Details"
                   >
-                    {activeTaskDetails.status}{' '}
-                    <FaSyncAlt className="text-[10px] anarchist-spin-hover" />
+                    <FaTimes className="text-xs" />
                   </button>
                 </div>
+
                 <div>
-                  <span className={styles.metaLabel}>Deadline target</span>
-                  <span className={styles.dueDateText}>{activeTaskDetails.dueDate}</span>
+                  <h4 className={styles.sectionLabel(darkMode)}>Functional Blueprint Scope</h4>
+                  <p className={styles.descriptionBox(darkMode)}>
+                    {activeTaskDetails.description ||
+                      'No metadata description constraints attached to this system entry.'}
+                  </p>
+                </div>
+
+                <div className={styles.metadataGrid}>
+                  <div>
+                    <span className={styles.metaLabel}>Status State</span>
+                    <button
+                      onClick={() => handleStatusCycle(activeTaskDetails)}
+                      className={styles.statusCycleLink}
+                    >
+                      {activeTaskDetails.status}{' '}
+                      <FaSyncAlt className="text-[10px] anarchist-spin-hover" />
+                    </button>
+                  </div>
+                  <div>
+                    <span className={styles.metaLabel}>Deadline target</span>
+                    <span className={styles.dueDateText}>{activeTaskDetails.dueDate}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.detailsFooter}>
+              {/* Action Utilities Footer Container */}
+              <div className="flex items-center space-x-3 pt-4 border-t border-slate-800/10 dark:border-slate-800/40">
+                <button
+                  onClick={() => setSharingTask(activeTaskDetails)}
+                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition-all duration-150 flex items-center space-x-2 border border-slate-700/60 shadow-sm"
+                >
+                  <FaUserPlus className="text-xs text-indigo-400" />
+                  <span>Share Node</span>
+                </button>
+
                 <button
                   onClick={() => handleDeleteTrigger(activeTaskDetails.id)}
-                  className={styles.deleteBtn}
+                  className={`${styles.deleteBtn} flex-1`}
                 >
                   <FaTrash className="text-xs" /> Delete Task Entry
                 </button>
@@ -203,6 +230,14 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
           )}
         </div>
       </div>
+
+      {/* Share Workspace Modal Overlay Context */}
+      <ShareTaskModal
+        isOpen={sharingTask !== null}
+        onClose={() => setSharingTask(null)}
+        task={sharingTask || (activeTaskDetails as Task)}
+        onShareSuccess={(updatedTask: Task) => handleShareSuccess(updatedTask)}
+      />
     </div>
   );
 };

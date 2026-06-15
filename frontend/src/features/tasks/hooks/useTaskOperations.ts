@@ -157,6 +157,20 @@ export const useTaskOperations = () => {
     },
     [logout]
   );
+  const onShareTaskSync = useCallback((updatedTask: Task) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === updatedTask.id ? updatedTask : task))
+    );
+  }, []);
 
-  return { tasks, isLoading, error, fetchTasks, createTask, updateTask, deleteTask };
+  return {
+    tasks,
+    isLoading,
+    error,
+    fetchTasks,
+    createTask,
+    updateTask,
+    deleteTask,
+    onShareTaskSync,
+  };
 };

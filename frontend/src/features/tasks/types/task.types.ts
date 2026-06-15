@@ -29,6 +29,7 @@ export interface AllTasksProps {
   onEditSelect: (task: Task) => void;
   onDeleteTask: (id: string) => Promise<boolean>;
   onUpdateStatus: (id: string, payload: Partial<Task>) => Promise<boolean>;
+  onShareSuccess: (updatedTask: Task) => void;
 }
 
 export interface TaskFormProps {

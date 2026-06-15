@@ -23,6 +23,20 @@ taskClient.interceptors.request.use(
 );
 
 // GUARD: Ensure response parsing only triggers for legitimate successful payloads
+const isTaskEndpoint = (url?: string) => {
+  if (!url) return false;
+  return /(^|\/)tasks(\/|$)/.test(url);
+};
+
+const normalizeTask = (djangoTask: any) => ({
+  ...djangoTask,
+  id: String(djangoTask.id),
+  title: djangoTask.title,
+  description: djangoTask.description || '',
+  status: djangoTask.status,
+  dueDate: djangoTask.due_date || djangoTask.dueDate,
+});
+
 taskClient.interceptors.response.use(
   (response) => {
     // 1. If the request URL contains 'token', bypass mapping completely
@@ -30,31 +44,24 @@ taskClient.interceptors.response.use(
       return response;
     }
 
-    // 2. If the response data is an array (TaskList API view)
-    if (Array.isArray(response.data)) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response.data = response.data.map((djangoTask: any) => ({
-        id: String(djangoTask.id),
-        title: djangoTask.title,
-        description: djangoTask.description || '',
-        status: djangoTask.status,
-        dueDate: djangoTask.due_date || djangoTask.dueDate,
-      }));
-    }
-    // 3. Only parse as a single task if it looks like a valid task object (has an id or title)
-    // This prevents parsing Django error structures like { detail: "..." }
-    else if (
-      response.data &&
-      typeof response.data === 'object' &&
-      ('id' in response.data || 'title' in response.data)
-    ) {
-      response.data = {
-        id: String(response.data.id),
-        title: response.data.title,
-        description: response.data.description || '',
-        status: response.data.status,
-        dueDate: response.data.due_date || response.data.dueDate,
-      };
+    // 2. Only normalize task payloads for task-specific endpoints.
+    const taskEndpoint = isTaskEndpoint(response.config.url);
+
+    if (taskEndpoint) {
+      if (Array.isArray(response.data)) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        response.data = response.data.map((djangoTask: any) => normalizeTask(djangoTask));
+      } else if (response.data && typeof response.data === 'object') {
+        if (
+          'task' in response.data &&
+          response.data.task &&
+          typeof response.data.task === 'object'
+        ) {
+          response.data.task = normalizeTask(response.data.task);
+        } else if ('id' in response.data || 'title' in response.data) {
+          response.data = normalizeTask(response.data);
+        }
+      }
     }
 
     return response;
