@@ -66,7 +66,7 @@ export const TaskAnalytics: React.FC = () => {
         setOverview(overviewResponse.data);
         setTrends(trendsResponse.data);
       } catch (err: unknown) {
-        console.error('Failed to query split analytics metrics:', err);
+        console.error('Failed to query analytics metrics:', err);
         setError('Could not access database metrics tracking.');
       } finally {
         setIsLoading(false);
