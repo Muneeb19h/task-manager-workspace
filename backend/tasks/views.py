@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.db.models import Q, Count          # Added Count here to fix aggregation queries
 from django.utils import timezone
+from datetime import timedelta
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import TaskSerializer, NotificationSerializer
@@ -292,41 +293,35 @@ class UserListAPIView(TaskBaseAPIView):
         return Response(list(users), status=status.HTTP_200_OK)
     
     
-class TaskAnalyticsView(APIView):
-    permission_classes = [IsAuthenticated]
+# 📊 NEW VIEW: GET /analytics/overview
+class TaskAnalyticsOverviewAPIView(TaskBaseAPIView):
+    """
+    Delivers summary metrics (total, completed, pending, in-progress) and pie chart data.
+    """
     def get(self, request, format=None):
         try:
-            # Scope data directly to the authenticated user requesting it
             user_tasks = Task.objects.filter(user=request.user)
             total_tasks = user_tasks.count()
+            now = timezone.now()
 
-            # Aggregate status distributions safely
             status_counts = user_tasks.values('status').annotate(count=Count('status'))
-            
-            # Map statuses to look exactly like the Recharts distribution schema expects
             status_map = {item['status']: item['count'] for item in status_counts}
             
             completed = status_map.get('Completed', 0)
             in_progress = status_map.get('In Progress', 0)
             pending = status_map.get('Pending', 0)
-
-            # Handle Overdue calculations safely against timezone bounds
-            now = timezone.now()
             overdue = user_tasks.filter(due_date__lt=now).exclude(status='Completed').count()
+            
+            completion_rate = round((completed / total_tasks) * 100, 1) if total_tasks > 0 else 0
 
-            # Calculate Completion Rate safely to avoid DivisionByZero crashes
-            completion_rate = 0
-            if total_tasks > 0:
-                completion_rate = round((completed / total_tasks) * 100, 1)
-
-            payload = {
+            return Response({
                 "summary": {
                     "total_tasks": total_tasks,
                     "completed": completed,
                     "in_progress": in_progress,
                     "pending": pending,
                     "overdue": overdue,
-                    "overdue_count": overdue,  # Serves as a fallback for both naming variants
+                    "overdue_count": overdue,
                     "completion_rate": completion_rate
                 },
                 "status_distribution": [
@@ -334,14 +329,76 @@ class TaskAnalyticsView(APIView):
                     {"name": "In Progress", "value": in_progress},
                     {"name": "Completed", "value": completed}
                 ]
-            }
-
-            return Response(payload, status=200)
-
+            }, status=status.HTTP_200_OK)
         except Exception as e:
+            print(f"❌ Overview Analytics Error: {str(e)}")
+            return Response({"error": "An internal error occurred running summary stats."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            print(f"❌ Analytics Engine Breakdown Error: {str(e)}")
-            return Response(
-                {"error": "An internal system anomaly occurred while aggregating metrics."}, 
-                status=500
-            )
+
+# 🗓️ NEW VIEW: GET /analytics/trends
+class TaskAnalyticsTrendsAPIView(TaskBaseAPIView):
+    """
+    Provides data coordinates for Weekly vs Monthly comparison datasets.
+    """
+    def get(self, request, format=None):
+        try:
+            user_tasks = Task.objects.filter(user=request.user)
+            now = timezone.now()
+
+            # 1. Weekly Trends Dataset (Last 7 Days)
+            # Use DateField-friendly lookups: compare DateField to date objects
+            weekly_trends = []
+            for i in range(6, -1, -1):
+                target_date = (now - timedelta(days=i)).date()
+                # Completed: tasks updated on that day
+                completed_count = user_tasks.filter(status='Completed', updated_at__date=target_date).count()
+                # Overdue: tasks with a due_date equal to the target date that are not completed
+                # and that are before today (i.e., truly overdue as of now)
+                overdue_count = user_tasks.filter(due_date=target_date).exclude(status='Completed')
+                if now.date() > target_date:
+                    overdue_count = overdue_count.filter(due_date__lt=now.date())
+                overdue_count = overdue_count.count()
+
+                weekly_trends.append({
+                    "date": target_date.strftime('%a'),
+                    "Completed": completed_count,
+                    "Overdue": overdue_count
+                })
+
+            # 2. Monthly Trends Dataset (Last 6 Months)
+            monthly_trends = []
+            for i in range(5, -1, -1):
+                check_date = now - timedelta(days=i * 30)
+                month_start = check_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+                if month_start.month == 12:
+                    next_month = month_start.replace(year=month_start.year + 1, month=1)
+                else:
+                    next_month = month_start.replace(month=month_start.month + 1)
+
+                # Convert month bounds to dates for comparing against DateField `due_date` safely
+                month_start_date = month_start.date()
+                next_month_date = next_month.date()
+
+                monthly_trends.append({
+                    "date": month_start.strftime('%b'),
+                    "Completed": user_tasks.filter(
+                        status='Completed', 
+                        updated_at__gte=month_start, 
+                        updated_at__lt=next_month
+                    ).count(),
+                    "Overdue": user_tasks.filter(
+                        due_date__gte=month_start_date, 
+                        due_date__lt=next_month_date
+                    ).filter(
+                        due_date__lt=now.date()
+                    ).exclude(status='Completed').count()
+                })
+
+            return Response({
+                "weekly_trends": weekly_trends,
+                "monthly_trends": monthly_trends
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"❌ Trends Analytics Error: {str(e)}")
+            return Response({"error": "An internal error occurred running timeline trend parameters."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
