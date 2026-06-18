@@ -3,6 +3,22 @@
 export const styles = {
   container: 'space-y-6 animate-fadeIn',
 
+  navContainer: (darkMode: boolean) => `
+    flex items-center space-x-2 p-1.5 rounded-xl border w-fit mb-4 transition-colors duration-200
+    ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'}
+  `,
+
+  navButton: (active: boolean, darkMode: boolean) => `
+    flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-150
+    ${
+      active
+        ? 'bg-indigo-600 text-slate-100 shadow-md'
+        : darkMode
+          ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+          : 'text-slate-600 hover:text-slate-800 hover:bg-slate-200/50'
+    }
+  `,
+
   headerCard: (darkMode: boolean) => `
     p-4 rounded-xl border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4
     ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200'}

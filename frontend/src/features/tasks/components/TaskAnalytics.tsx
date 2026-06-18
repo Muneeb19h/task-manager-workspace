@@ -46,7 +46,11 @@ interface TrendsData {
   monthly_trends: TrendNode[];
 }
 
-export const TaskAnalytics: React.FC = () => {
+interface TaskAnalyticsProps {
+  darkMode?: boolean;
+}
+
+export const TaskAnalytics: React.FC<TaskAnalyticsProps> = ({ darkMode = true }) => {
   const [overview, setOverview] = useState<OverviewData | null>(null);
   const [trends, setTrends] = useState<TrendsData | null>(null);
   const [timeframe, setTimeframe] = useState<'weekly' | 'monthly'>('weekly');
@@ -103,12 +107,12 @@ export const TaskAnalytics: React.FC = () => {
     <div className="space-y-6 p-1">
       {/* 📊 Section Header */}
       <div className="flex items-center space-x-3">
-        <div className="p-2.5 bg-indigo-600/20 text-indigo-400 rounded-xl">
+        <div className={`p-2.5 rounded-xl ${darkMode ? 'bg-indigo-600/20 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
           <FaChartPie className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-slate-100">Workspace Metrics Dashboard</h2>
-          <p className="text-xs text-slate-400">
+          <h2 className={`text-lg font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Workspace Metrics Dashboard</h2>
+          <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             Data-driven performance insights for your collaborative items.
           </p>
         </div>
@@ -116,57 +120,71 @@ export const TaskAnalytics: React.FC = () => {
 
       {/* 📈 High-Level Stat Grid Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+        {/* Total Registry */}
+        <div className={`p-4 rounded-2xl flex items-center justify-between border ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
           <div>
-            <p className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
+            <p className={`text-[10px] font-mono uppercase tracking-wider ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
               Total Registry
             </p>
-            <h3 className="text-2xl font-black mt-1 text-slate-100">{summary.total_tasks}</h3>
+            <h3 className={`text-2xl font-black mt-1 ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{summary.total_tasks}</h3>
           </div>
-          <FaTasks className="text-slate-700 w-5 h-5" />
+          <FaTasks className={`${darkMode ? 'text-slate-700' : 'text-slate-300'} w-5 h-5`} />
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+        {/* Completed */}
+        <div className={`p-4 rounded-2xl flex items-center justify-between border ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
           <div>
             <p className="text-[10px] font-mono uppercase tracking-wider text-emerald-500">
               Completed
             </p>
-            <h3 className="text-2xl font-black mt-1 text-emerald-400">{summary.completed}</h3>
+            <h3 className={`text-2xl font-black mt-1 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>{summary.completed}</h3>
           </div>
-          <FaCheckCircle className="text-emerald-950 w-5 h-5" />
+          <FaCheckCircle className={`${darkMode ? 'text-emerald-950' : 'text-emerald-200'} w-5 h-5`} />
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+        {/* Efficiency Index */}
+        <div className={`p-4 rounded-2xl flex items-center justify-between border ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
           <div>
             <p className="text-[10px] font-mono uppercase tracking-wider text-indigo-500">
               Efficiency Index
             </p>
-            <h3 className="text-2xl font-black mt-1 text-indigo-400">{summary.completion_rate}%</h3>
+            <h3 className={`text-2xl font-black mt-1 ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>{summary.completion_rate}%</h3>
           </div>
-          <div className="text-xs font-bold font-mono text-indigo-500/30">CR</div>
+          <div className={`text-xs font-bold font-mono ${darkMode ? 'text-indigo-500/30' : 'text-indigo-600/30'}`}>CR</div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between">
+        {/* Overdue Items */}
+        <div className={`p-4 rounded-2xl flex items-center justify-between border ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
           <div>
             <p className="text-[10px] font-mono uppercase tracking-wider text-rose-500">
               Overdue Items
             </p>
-            <h3 className="text-2xl font-black mt-1 text-rose-400">{summary.overdue_count}</h3>
+            <h3 className={`text-2xl font-black mt-1 ${darkMode ? 'text-rose-400' : 'text-rose-600'}`}>{summary.overdue_count}</h3>
           </div>
-          <FaExclamationTriangle className="text-rose-950 w-5 h-5" />
+          <FaExclamationTriangle className={`${darkMode ? 'text-rose-950' : 'text-rose-200'} w-5 h-5`} />
         </div>
       </div>
 
       {/* 📉 Distribution Charts Layer */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pie Breakdown (Takes 1 Columns) */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl lg:col-span-1">
-          <h4 className="text-xs font-black font-mono uppercase tracking-wider text-slate-400 mb-4">
+        <div className={`p-5 rounded-2xl border lg:col-span-1 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
+          <h4 className={`text-xs font-black font-mono uppercase tracking-wider mb-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             Task Status Breakdown
           </h4>
           <div className="h-64 w-full flex items-center justify-center">
             {summary.total_tasks === 0 ? (
-              <p className="text-xs text-slate-500">No data context available.</p>
+              <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>No data context available.</p>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -185,15 +203,16 @@ export const TaskAnalytics: React.FC = () => {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderColor: '#1e293b',
+                      backgroundColor: darkMode ? '#0f172a' : '#ffffff',
+                      borderColor: darkMode ? '#1e293b' : '#e2e8f0',
                       borderRadius: '12px',
+                      boxShadow: darkMode ? 'none' : '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
-                    itemStyle={{ color: '#f1f5f9', fontSize: '12px' }}
+                    itemStyle={{ color: darkMode ? '#f1f5f9' : '#0f172a', fontSize: '12px' }}
                   />
                   <Legend
                     formatter={(value) => (
-                      <span className="text-slate-300 text-xs font-medium">{value}</span>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>{value}</span>
                     )}
                   />
                 </PieChart>
@@ -203,21 +222,27 @@ export const TaskAnalytics: React.FC = () => {
         </div>
 
         {/* 🌟 Line Trends Section (Takes up remaining 2 Columns) */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl lg:col-span-2">
+        <div className={`p-5 rounded-2xl border lg:col-span-2 ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+        }`}>
           <div className="flex justify-between items-center mb-4">
-            <h4 className="text-xs font-black font-mono uppercase tracking-wider text-slate-400">
+            <h4 className={`text-xs font-black font-mono uppercase tracking-wider ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
               Productivity Trends
             </h4>
 
-            {/* Dark Styled Timeframe Toggles */}
-            <div className="inline-flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+            {/* Styled Timeframe Toggles */}
+            <div className={`inline-flex p-1 rounded-xl border ${
+              darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+            }`}>
               <button
                 type="button"
                 onClick={() => setTimeframe('weekly')}
                 className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-all ${
                   timeframe === 'weekly'
                     ? 'bg-indigo-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : darkMode
+                      ? 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Weekly
@@ -228,7 +253,9 @@ export const TaskAnalytics: React.FC = () => {
                 className={`px-3 py-1 text-[11px] font-bold rounded-lg transition-all ${
                   timeframe === 'monthly'
                     ? 'bg-indigo-600 text-white shadow'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : darkMode
+                      ? 'text-slate-400 hover:text-slate-200'
+                      : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Monthly
@@ -239,7 +266,7 @@ export const TaskAnalytics: React.FC = () => {
           <div className="h-64 w-full">
             {summary.total_tasks === 0 ? (
               <div className="h-full flex items-center justify-center">
-                <p className="text-xs text-slate-500">No trend context history found.</p>
+                <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>No trend context history found.</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -247,15 +274,16 @@ export const TaskAnalytics: React.FC = () => {
                   data={activeTrendData}
                   margin={{ top: 10, right: 10, left: -25, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} dy={10} />
-                  <YAxis stroke="#64748b" fontSize={11} tickLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#1e293b' : '#e2e8f0'} vertical={false} />
+                  <XAxis dataKey="date" stroke={darkMode ? '#64748b' : '#94a3b8'} fontSize={11} tickLine={false} dy={10} />
+                  <YAxis stroke={darkMode ? '#64748b' : '#94a3b8'} fontSize={11} tickLine={false} allowDecimals={false} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0f172a',
-                      borderColor: '#1e293b',
+                      backgroundColor: darkMode ? '#0f172a' : '#ffffff',
+                      borderColor: darkMode ? '#1e293b' : '#e2e8f0',
                       borderRadius: '12px',
-                      color: '#f1f5f9',
+                      color: darkMode ? '#f1f5f9' : '#0f172a',
+                      boxShadow: darkMode ? 'none' : '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                     }}
                     itemStyle={{ fontSize: '12px' }}
                   />
@@ -264,6 +292,9 @@ export const TaskAnalytics: React.FC = () => {
                     height={36}
                     iconType="circle"
                     wrapperStyle={{ fontSize: '11px' }}
+                    formatter={(value) => (
+                      <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>{value}</span>
+                    )}
                   />
 
                   {/* Completed Tasks Curve */}

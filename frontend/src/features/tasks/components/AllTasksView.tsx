@@ -69,15 +69,11 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
 
   return (
     <div className={styles.container}>
-      {/* 🧭 Top Navigation Subsystem Bar */}
-      <div className="flex items-center space-x-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800/40 dark:border-slate-800 w-fit mb-4">
+      {/* Top Navigation Subsystem Bar */}
+      <div className={styles.navContainer(darkMode)}>
         <button
           onClick={() => setActiveTab('list')}
-          className={`flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-150 ${
-            activeTab === 'list'
-              ? 'bg-indigo-600 text-slate-100 shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
+          className={styles.navButton(activeTab === 'list', darkMode)}
         >
           <FaTasks className="w-3.5 h-3.5" />
           <span>Active Workspaces</span>
@@ -85,25 +81,21 @@ export const AllTasksView: React.FC<AllTasksProps> = ({
 
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-lg transition-all duration-150 ${
-            activeTab === 'analytics'
-              ? 'bg-indigo-600 text-slate-100 shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
+          className={styles.navButton(activeTab === 'analytics', darkMode)}
         >
           <FaChartBar className="w-3.5 h-3.5" />
           <span>Metrics & Analytics</span>
         </button>
       </div>
 
-      {/* 🔄 Conditional View Switch Layer */}
+      {/* Conditional View Switch Layer */}
       {activeTab === 'analytics' ? (
-        /* 📊 Analytics Panel Tab Viewport */
+        /* Analytics Panel Tab Viewport */
         <div className="animate-fadeIn">
-          <TaskAnalytics />
+          <TaskAnalytics darkMode={darkMode} />
         </div>
       ) : (
-        /* 📋 Standard Task Management Grid List (Original Content) */
+        /* Standard Task Management Grid List (Original Content) */
         <div className="space-y-6">
           {/* Dynamic Selector Header */}
           <div className={styles.headerCard(darkMode)}>
