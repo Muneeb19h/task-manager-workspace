@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const taskClient = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/',
+  baseURL: import.meta.env.DEV ? 'http://127.0.0.1:8000/api/' : '/api/',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -28,6 +28,7 @@ const isTaskEndpoint = (url?: string) => {
   return /(^|\/)tasks(\/|$)/.test(url);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const normalizeTask = (djangoTask: any) => ({
   ...djangoTask,
   id: String(djangoTask.id),

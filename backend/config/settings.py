@@ -29,7 +29,12 @@ SECRET_KEY = 'django-insecure-*!6pi3voh%asu4vv%hb=4)yyz*^@v)iiw926khb-9i=ezpzefh
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'task-manager-workspace.vercel.app', 
+    '.vercel.app', 
+    '127.0.0.1', 
+    'localhost'
+]
 
 
 # Application definition
@@ -69,6 +74,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Default Vite dev port
     "http://127.0.0.1:5173",
     "http://localhost:3000",  # Default CRA dev port
+    "https://task-manager-workspace.vercel.app",
 ]
 ROOT_URLCONF = 'config.urls'
 
@@ -158,3 +164,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

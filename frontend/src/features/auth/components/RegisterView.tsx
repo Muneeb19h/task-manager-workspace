@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { authClient } from '../authClient';
 
 export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => void }> = ({
   darkMode,
@@ -19,7 +19,7 @@ export const RegisterView: React.FC<{ darkMode: boolean; onSwitchToLogin: () => 
       return;
     }
     try {
-      await axios.post('http://127.0.0.1:8000/api/register/', {
+      await authClient.post('register/', {
         username,
         password,
       });

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { authClient } from '../authClient';
 
 // Added props to allow navigating back and forth with your new Registration card
 interface LoginViewProps {
@@ -21,7 +21,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ darkMode, onSwitchToRegist
     setLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const response = await authClient.post('token/', {
         username,
         password,
       });
