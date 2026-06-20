@@ -107,11 +107,6 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD'),
         'HOST': env('DB_HOST'),
         'PORT': env('DB_PORT'),
-        # Use persistent connections on production and enable SSL for Neon
-        'CONN_MAX_AGE': env.int('DB_CONN_MAX_AGE', default=600),
-        'OPTIONS': {
-            'sslmode': env('DB_SSLMODE', default='require')
-        },
     }
 }
 
