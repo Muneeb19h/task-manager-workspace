@@ -13,19 +13,19 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "^/api(?:/(.*))?$",
       "dest": "backend/vercel_app.py"
     },
     {
-      "src": "/admin/(.*)",
+      "src": "^/admin(?:/(.*))?$",
       "dest": "backend/vercel_app.py"
     },
     {
-      "src": "/static/(.*)",
+      "src": "^/static/(.*)$",
       "dest": "backend/vercel_app.py"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(.*)$",
       "dest": "frontend/$1",
       "continue": true
     }
